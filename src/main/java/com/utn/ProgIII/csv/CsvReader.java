@@ -69,7 +69,7 @@ public class CsvReader {
      * @return Un mensaje de error que lista los productos que no fueron actualizados
      */
     public NonAffectedProductsListDTO uploadToDatabase(String csvFilePath, Long supplierId) {
-        String message = "Productos no subidos";
+        String message = "Productos no modificados";
         List<ProductInfoFromCsvDTO> uploads;
         List<ProductInfoFromCsvDTO> failedUploads = new ArrayList<>();
 
@@ -102,7 +102,7 @@ public class CsvReader {
      * @return Un mensaje de error diciendo que productos no fueron cargados
      */
     public NonAffectedProductsListDTO uploadToDatabase(String csvFilePath, Long supplierId, BigDecimal bulkProfitMargin) {
-        String message = "Productos no subidos";
+        String message = "Productos no existentes";
         List<ProductInfoFromCsvDTO> uploads;
         List<ProductInfoFromCsvDTO> failedUploads = new ArrayList<>();
         try {

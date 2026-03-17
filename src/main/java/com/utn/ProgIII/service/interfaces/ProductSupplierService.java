@@ -6,6 +6,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 public interface ProductSupplierService {
 
@@ -15,6 +16,6 @@ public interface ProductSupplierService {
     void deleteProductSupplier(Long idProductSupplier);
     SupplierProductListDTO listProductsBySupplier(Pageable pageable, Long companyName, String exchange_rate);
     ProductPricesDTO listPricesByProduct(Pageable pageable, Long idProduct, String exchange_rate);
-    String uploadCsv(String filepath, Long idSupplier);
-    String uploadCsv(String filepath, Long idSupplier, BigDecimal bulkProfitMargin);
+    NonAffectedProductsListDTO uploadCsv(String filepath, Long idSupplier);
+    NonAffectedProductsListDTO uploadCsv(String filepath, Long idSupplier, BigDecimal bulkProfitMargin);
 }

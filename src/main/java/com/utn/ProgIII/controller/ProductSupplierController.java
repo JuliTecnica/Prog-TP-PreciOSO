@@ -172,7 +172,19 @@ public class ProductSupplierController {
                     "productos que no pudieron ser cargados")
     @ApiResponse(responseCode = "200",description = "Actualización realizada, devuelve un listado con aquellos productos que no pudieron ser cargados", content = @Content(
             mediaType = "text/plain;charset=UTF-8",
-            schema = @Schema(example = "Productos no subidos:\nProduct 1\nProduct 3")
+            schema = @Schema(example = "{\n" +
+                    "    \"message\": \"Productos no subidos\",\n" +
+                    "    \"nonAffectedProducts\": [\n" +
+                    "        {\n" +
+                    "            \"nombre\": \"Product 9999\",\n" +
+                    "            \"precio\": 15\n" +
+                    "        },\n" +
+                    "        {\n" +
+                    "            \"nombre\": \"Semillas de tomate trituradas\",\n" +
+                    "            \"precio\": 23\n" +
+                    "        }\n" +
+                    "    ]\n" +
+                    "}")
     ))
     @ApiResponse(responseCode = "404",description = "El proveedor elegido no existe", content = @Content(
             mediaType = "text/plain;charset=UTF-8",
@@ -203,7 +215,19 @@ public class ProductSupplierController {
                     "productos que no pudieron ser cargados")
     @ApiResponse(responseCode = "200",description = "Actualización realizada, devuelve listado con aquellos productos que no pudieron ser cargados (productos desactivados o no existentes)", content = @Content(
             mediaType = "text/plain;charset=UTF-8",
-            schema = @Schema(example = "Productos no subidos:\nProduct 1\nProduct 3")
+            schema = @Schema(example = "{\n" +
+                    "    \"message\": \"Productos no subidos\",\n" +
+                    "    \"nonAffectedProducts\": [\n" +
+                    "        {\n" +
+                    "            \"nombre\": \"Product 9999\",\n" +
+                    "            \"precio\": 15\n" +
+                    "        },\n" +
+                    "        {\n" +
+                    "            \"nombre\": \"Semillas de tomate trituradas\",\n" +
+                    "            \"precio\": 23\n" +
+                    "        }\n" +
+                    "    ]\n" +
+                    "}")
     ))
     @ApiResponse(responseCode = "404",description = "El proveedor elegido no existe", content = @Content(
             mediaType = "text/plain;charset=UTF-8",

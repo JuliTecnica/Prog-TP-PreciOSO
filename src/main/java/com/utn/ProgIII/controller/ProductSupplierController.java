@@ -23,6 +23,7 @@ import java.io.File;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.nio.file.Files;
+import java.util.List;
 
 /**
  * Clase que maneja requests sobre la relación de productos y proveedores
@@ -179,9 +180,9 @@ public class ProductSupplierController {
     ))
     @ApiResponse(responseCode = "500",description = "El servidor no pudo procesar el archivo", content = @Content())
     @PostMapping(path = "/upload", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
-    public ResponseEntity<String> updateWithFile(@RequestParam("file") MultipartFile file,@RequestParam @Parameter(example = "1", description = "El ID de un proveedor") Long idSupplier) {
+    public ResponseEntity<NonAffectedProductsListDTO> updateWithFile(@RequestParam("file") MultipartFile file,@RequestParam @Parameter(example = "1", description = "El ID de un proveedor") Long idSupplier) {
         String filename = file.getOriginalFilename();
-        String response;
+        NonAffectedProductsListDTO response;
 
         try {
             String tmpdir = Files.createTempDirectory("tmpDirPrefix").toFile().getAbsolutePath();
@@ -213,11 +214,11 @@ public class ProductSupplierController {
             schema = @Schema(example = "Error subiendo el archivo: (mensaje de excepción)")
     ))
     @PostMapping(path = "/uploadNonRelatedProducts", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
-    public ResponseEntity<String> updateWithFileAndProfitMargin(@RequestParam("file") MultipartFile file,
+    public ResponseEntity<NonAffectedProductsListDTO> updateWithFileAndProfitMargin(@RequestParam("file") MultipartFile file,
                                                                 @RequestParam @Parameter(example = "1", description = "El ID de un proveedor") Long idSupplier,
                                                                 @RequestParam(required = false) @Parameter(example = "20", description = "El porcentaje de margen de ganancia") BigDecimal bulkProfitMargin) {
         String filename = file.getOriginalFilename();
-        String response;
+        NonAffectedProductsListDTO response;
         if (bulkProfitMargin == null) bulkProfitMargin = BigDecimal.valueOf(0);
 
         try {

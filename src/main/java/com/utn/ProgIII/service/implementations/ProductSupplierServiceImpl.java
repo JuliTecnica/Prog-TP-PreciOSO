@@ -201,7 +201,7 @@ public class ProductSupplierServiceImpl implements ProductSupplierService {
      * @param idSupplier El ID del proveedor para modificar sus relaciones
      */
     @Override
-    public String uploadCsv(String filepath, Long idSupplier) {
+    public NonAffectedProductsListDTO uploadCsv(String filepath, Long idSupplier) {
 
         if(!supplierRepository.existsById(idSupplier))
         {
@@ -220,7 +220,7 @@ public class ProductSupplierServiceImpl implements ProductSupplierService {
      * @see CsvReader
      */
     @Override
-    public String  uploadCsv(String filepath, Long idSupplier, BigDecimal bulkProfitMargin) {
+    public NonAffectedProductsListDTO uploadCsv(String filepath, Long idSupplier, BigDecimal bulkProfitMargin) {
 
         if(!supplierRepository.existsById(idSupplier))
         {

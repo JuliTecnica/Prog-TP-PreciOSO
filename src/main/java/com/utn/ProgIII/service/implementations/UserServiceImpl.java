@@ -1,9 +1,6 @@
 package com.utn.ProgIII.service.implementations;
 
-import com.utn.ProgIII.dto.CreateCredentialDTO;
-import com.utn.ProgIII.dto.CreateUserDTO;
-import com.utn.ProgIII.dto.UserWithCredentialDTO;
-import com.utn.ProgIII.dto.ViewSupplierDTO;
+import com.utn.ProgIII.dto.*;
 import com.utn.ProgIII.exceptions.*;
 import com.utn.ProgIII.mapper.UserMapper;
 import com.utn.ProgIII.model.Credential.Role;
@@ -22,7 +19,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -69,6 +65,24 @@ public class UserServiceImpl implements UserService {
         this.userValidations = userValidations;
         this.credentialValidations = credentialValidations;
         this.passwordEncoder = passwordEncoder;
+    }
+
+    @Override
+    @Transactional
+    public UserWithCredentialDTO createUserNoAuth(CreateUserNoAuthDTO dto) {
+        User user = userMapper.toEntityNoRoleOrStatus(dto);
+
+        user.setStatus(UserStatus.ENABLED);
+        user.getCredential().setRole(Role.EMPLOYEE); // PROVISORIO!!!
+
+        userValidations.validateUserByDni(dto.dni());
+        credentialValidations.validateUsernameNotExists(dto.credential().username());
+
+        user.getCredential().setPassword(passwordEncoder.encode(user.getCredential().getPassword()));
+
+        user = userRepository.save(user);
+
+        return userMapper.toUserWithCredentialDTO(user);
     }
 
     /**

@@ -18,8 +18,6 @@ public class ProductSupplierMapper {
                 productSupplier.getSupplier().getIdSupplier(),
                 productSupplier.getSupplier().getCompanyName(),
                 productSupplier.getCost()
-//                productSupplier.getProfitMargin(),
-//                productSupplier.getPrice()
         );
     }
 }

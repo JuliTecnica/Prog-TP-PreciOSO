@@ -23,8 +23,10 @@ public class ProductMapper {
         Long idProduct = product.getIdProduct();
         String name = product.getName();
         String status = product.getStatus().toString();
+        Float profitMargin = product.getProfitMargin();
+        Float stock = product.getStock();
 
-        return new ProductDTO(idProduct,name,status);
+        return new ProductDTO(idProduct,name,status, profitMargin, stock);
     }
 
     /**
@@ -43,6 +45,9 @@ public class ProductMapper {
         }
 
         result.setStatus(productDTO.status() == null ? ProductStatus.ENABLED : ProductStatus.valueOf(productDTO.status().toUpperCase()));
+
+        result.setProfitMargin(productDTO.profitMargin());
+        result.setStock(productDTO.stock());
 
         return result;
     }

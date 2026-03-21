@@ -217,6 +217,9 @@ public class ProductServiceImpl implements ProductService {
             productSupplierRepository.removeAllByProduct_IdProduct(id);
         }
 
+        product.setProfitMargin(productDto.profitMargin());
+        product.setStock(productDto.stock());
+
         product = productRepository.save(product);
         return productMapper.toProductDTO(product);
     }

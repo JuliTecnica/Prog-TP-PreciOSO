@@ -12,5 +12,9 @@ public record ProductDTO (
         @Schema(example = "Pasas de uva")
         String name,
         @Schema(implementation = ProductStatus.class)
-        String status) {
+        String status,
+        @Schema(example = "0.4")
+        Float profitMargin,
+        @Schema(example = "1.5")
+        Float stock) {
 }

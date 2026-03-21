@@ -82,8 +82,7 @@ public class ProductSupplierServiceImpl implements ProductSupplierService {
         ProductSupplier productSupplier = new ProductSupplier(
                 supplier,
                 product,
-                createProductSupplierDTO.cost(),
-                createProductSupplierDTO.profitMargin()
+                createProductSupplierDTO.cost()
         );
 
         productSupplierValidations.validateRelationship(productSupplier);
@@ -118,8 +117,8 @@ public class ProductSupplierServiceImpl implements ProductSupplierService {
         BigDecimal newProfitMargin = updateProductSupplierDTO.profitMargin();
 
         productSupplier.setCost(newCost);
-        productSupplier.setProfitMargin(newProfitMargin);
-        productSupplier.setPrice(newCost.add(newCost.multiply(newProfitMargin).divide(BigDecimal.valueOf(100),2,RoundingMode.CEILING)));
+//        productSupplier.setProfitMargin(newProfitMargin);
+//        productSupplier.setPrice(newCost.add(newCost.multiply(newProfitMargin).divide(BigDecimal.valueOf(100),2,RoundingMode.CEILING)));
 
         productSupplierRepository.save(productSupplier);
 

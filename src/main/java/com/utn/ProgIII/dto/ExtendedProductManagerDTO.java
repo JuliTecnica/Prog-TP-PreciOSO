@@ -13,10 +13,10 @@ public record ExtendedProductManagerDTO(
         String name,
         @Schema(example = "200")
         BigDecimal cost,
-        @Schema(example = "30")
-        BigDecimal profitMargin,
-        @Schema(example = "260")
-        BigDecimal price,
+//        @Schema(example = "30")
+//        BigDecimal profitMargin,
+//        @Schema(example = "260")
+//        BigDecimal price,
         @Schema(example = "0.01")
         BigDecimal dollarPrice
 ) {

@@ -114,7 +114,7 @@ public class CsvReader {
                 ProductSupplier relationship = productSupplierRepository.getByProductAndSupplier(productData,supplierData);
                 if (productData != null && productData.getStatus().equals(ProductStatus.ENABLED)) {
                     if (relationship == null) {
-                        relationship = new ProductSupplier(supplierData,productData,productUpdateInfo.cost(),bulkProfitMargin);
+                        relationship = new ProductSupplier(supplierData,productData,productUpdateInfo.cost());
                     } else {
                         relationship = updateRelationshipPricing(productUpdateInfo, relationship);
                     }
@@ -141,10 +141,10 @@ public class CsvReader {
      */
     public ProductSupplier updateRelationshipPricing(ProductInfoFromCsvDTO productUpdateInfo, ProductSupplier relationship) {
         relationship.setCost(productUpdateInfo.cost());
-        relationship.setPrice(relationship.getCost()
-                .add(relationship.getCost()
-                        .multiply(relationship.getProfitMargin())
-                        .divide(BigDecimal.valueOf(100), RoundingMode.CEILING)));
+//        relationship.setPrice(relationship.getCost()
+//                .add(relationship.getCost()
+//                        .multiply(relationship.getProfitMargin())
+//                        .divide(BigDecimal.valueOf(100), RoundingMode.CEILING)));
         return relationship;
     }
 }

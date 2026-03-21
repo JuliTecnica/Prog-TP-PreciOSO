@@ -37,9 +37,9 @@ public class MiscServiceImpl implements MiscService {
             BackendRequest dollarrequest = new BackendRequest(dolar_api_url, "dolares/" + exchange_rate);
             dolar = JSONConverter.makeJsonObject(dollarrequest.searchData());
         } catch (IOException e) {
-            throw new UnexpectedServerErrorException("Ocurrió un error conectando a la API del precio del dólar");
+            throw new UnexpectedServerErrorException("Ocurrió un error conectando a la API del precio del dólar", 500);
         } catch (InterruptedException | IncorrectParseMethodException e) {
-            throw new UnexpectedServerErrorException("Un error inesperado ocurrió en el servicio.");
+            throw new UnexpectedServerErrorException("Un error inesperado ocurrió en el servicio.",500);
         } catch (BadRequestException e) {
 
             if(e.getHttpCode() != 404)

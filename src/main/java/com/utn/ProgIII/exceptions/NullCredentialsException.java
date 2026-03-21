@@ -1,6 +1,6 @@
 package com.utn.ProgIII.exceptions;
 
-public class NullCredentialsException extends RuntimeException {
+public class NullCredentialsException extends BadRequestException {
     public NullCredentialsException(String message) {
         super(message);
     }

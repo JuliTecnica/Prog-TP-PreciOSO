@@ -14,6 +14,8 @@ import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
+import java.net.URI;
+import java.time.Instant;
 import java.util.List;
 
 /**
@@ -23,8 +25,7 @@ import java.util.List;
 
 @ControllerAdvice
 public class GlobalExceptionHandler {
-
-
+    /*
     @ExceptionHandler({SupplierNotFoundException.class})
     public ResponseEntity<Object> supplierNotFoundException(SupplierNotFoundException ex)
     {
@@ -36,11 +37,6 @@ public class GlobalExceptionHandler {
     public ResponseEntity<Object> addressNotFoundException(AddressNotFoundException ex) {
         return ResponseEntity.status(HttpStatus.NOT_FOUND)
                 .body(ex.getMessage());
-    }
-
-    @ExceptionHandler(ConstraintViolationException.class)
-    public ResponseEntity<String> handleConstraintViolationException(ConstraintViolationException ex) {
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(getViolatedConstraints(ex));
     }
 
     @ExceptionHandler(DuplicateEntityException.class)
@@ -81,18 +77,6 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
     }
 
-    private String getViolatedConstraints(ConstraintViolationException ex) {
-        List<ConstraintViolation<?>> constraintViolations = ex.getConstraintViolations().stream().toList();
-        StringBuilder constraintViolationMessages = new StringBuilder("Restricciones vulneradas: \n");
-        for (ConstraintViolation<?> constraintViolation: constraintViolations) {
-            String message = constraintViolation.getMessageTemplate();
-            constraintViolationMessages.append(message);
-            constraintViolationMessages.append("\n");
-        }
-
-        return constraintViolationMessages.toString();
-    }
-
     @ExceptionHandler(DuplicateRelationshipException.class)
     public ResponseEntity<String> handleDuplicateRelationshipException(DuplicateRelationshipException ex){
         return ResponseEntity.status(HttpStatus.CONFLICT).body(ex.getMessage());
@@ -115,11 +99,6 @@ public class GlobalExceptionHandler {
                          .body(ex.getMessage());
     }
 
-    @ExceptionHandler(AuthenticationException.class)
-    public ResponseEntity<String> handleAuthException(AuthenticationException e){
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("No se encontró el usuario");
-    }
-
     @ExceptionHandler(UnexpectedServerErrorException.class)
     public ResponseEntity<String> UnexpectedErrorException(UnexpectedServerErrorException e) {
         if(e.getHttpcode() != -1)
@@ -130,22 +109,46 @@ public class GlobalExceptionHandler {
         }
     }
 
-    @ExceptionHandler(ExpiredJwtException.class)
-    public ResponseEntity<String> ExpiredTokenException(ExpiredJwtException e)
-    {
-        return ResponseEntity.status(419).body("La sesión ha expirado. Por favor, iniciar sesión de nuevo");
-    }
-
     @ExceptionHandler(SelfDeleteUserException.class)
     public ResponseEntity<String> SelfDeleteUserProtection(SelfDeleteUserException e)
     {
         return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
     }
 
-    @ExceptionHandler(PropertyReferenceException.class)
-    public ResponseEntity<String> wrongFieldSortException(PropertyReferenceException e)
+    @ExceptionHandler(ForbiddenModificationException.class)
+    public ResponseEntity<String> forbiddenModificationException(ForbiddenModificationException e)
     {
-        return ResponseEntity.badRequest().body(e.getMessage());
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(e.getMessage());
+    }
+
+    @ExceptionHandler(NonExistentRelationshipException.class)
+    public ResponseEntity<String> handleNonExistentRelationshipException(NonExistentRelationshipException ex){
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
+    }
+    */
+
+
+    @ExceptionHandler(ConstraintViolationException.class)
+    public ResponseEntity<String> handleConstraintViolationException(ConstraintViolationException ex) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(getViolatedConstraints(ex));
+    }
+
+    private String getViolatedConstraints(ConstraintViolationException ex) {
+        List<ConstraintViolation<?>> constraintViolations = ex.getConstraintViolations().stream().toList();
+        StringBuilder constraintViolationMessages = new StringBuilder("Restricciones vulneradas: \n");
+        for (ConstraintViolation<?> constraintViolation: constraintViolations) {
+            String message = constraintViolation.getMessageTemplate();
+            constraintViolationMessages.append(message);
+            constraintViolationMessages.append("\n");
+        }
+
+        return constraintViolationMessages.toString();
+    }
+
+    @ExceptionHandler(ExpiredJwtException.class)
+    public ResponseEntity<String> ExpiredTokenException(ExpiredJwtException e)
+    {
+        return ResponseEntity.status(419).body("La sesión ha expirado. Por favor, iniciar sesión de nuevo");
     }
 
     @ExceptionHandler(MissingServletRequestParameterException.class)
@@ -154,10 +157,10 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("El parámetro \"" + name + "\" está ausente");
     }
 
-    @ExceptionHandler(ForbiddenModificationException.class)
-    public ResponseEntity<String> forbiddenModificationException(ForbiddenModificationException e)
+    @ExceptionHandler(PropertyReferenceException.class)
+    public ResponseEntity<String> wrongFieldSortException(PropertyReferenceException e)
     {
-        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(e.getMessage());
+        return ResponseEntity.badRequest().body(e.getMessage());
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
@@ -168,19 +171,57 @@ public class GlobalExceptionHandler {
 
     private String handleMethodArgumentNotValid(MethodArgumentNotValidException e)
     {
-         List<FieldError> errors = e.getFieldErrors();
-         String message = "Error en pedido:\n";
-         for(FieldError error : errors)
-         {
-             message = message.concat("- " + error.getDefaultMessage() + "\n");
-         }
+        List<FieldError> errors = e.getFieldErrors();
+        String message = "Error en pedido:\n";
+        for(FieldError error : errors)
+        {
+            message = message.concat("- " + error.getDefaultMessage() + "\n");
+        }
 
-         return message;
+        return message;
+    }
+    /* CUSTOM MADE EXCEPTIONS */
+
+    @ExceptionHandler({NotFoundException.class})
+    private ProblemDetail handleNotFoundException(NotFoundException e)
+    {
+        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.NOT_FOUND, e.getMessage());
+        problemDetail.setTitle(e.getTitle());
+        problemDetail.setProperty("timestamp", Instant.now());
+
+        return problemDetail;
     }
 
-    @ExceptionHandler(NonExistentRelationshipException.class)
-    public ResponseEntity<String> handleNonExistentRelationshipException(NonExistentRelationshipException ex){
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
+    @ExceptionHandler({ConflictException.class})
+    private ProblemDetail handleConflictException(ConflictException e)
+    {
+        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.CONFLICT, e.getMessage());
+        problemDetail.setTitle(e.getTitle());
+        problemDetail.setProperty("timestamp", Instant.now());
+
+        return problemDetail;
     }
+
+    @ExceptionHandler({BadRequestException.class})
+    private ProblemDetail handleBadRequestException(BadRequestException e)
+    {
+        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, e.getMessage());
+        problemDetail.setTitle(e.getTitle());
+        problemDetail.setProperty("timestamp", Instant.now());
+
+        return problemDetail;
+    }
+
+    @ExceptionHandler({InvalidActionException.class})
+    private ProblemDetail handleInvalidActionException(InvalidActionException e)
+    {
+        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.FORBIDDEN, e.getMessage());
+        problemDetail.setTitle(problemDetail.getTitle());
+        problemDetail.setProperty("timestamp", Instant.now());
+
+        return problemDetail;
+    }
+
+
 
 }

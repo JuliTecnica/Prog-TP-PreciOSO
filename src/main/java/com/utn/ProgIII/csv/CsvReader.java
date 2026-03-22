@@ -141,10 +141,6 @@ public class CsvReader {
      */
     public ProductSupplier updateRelationshipPricing(ProductInfoFromCsvDTO productUpdateInfo, ProductSupplier relationship) {
         relationship.setCost(productUpdateInfo.cost());
-//        relationship.setPrice(relationship.getCost()
-//                .add(relationship.getCost()
-//                        .multiply(relationship.getProfitMargin())
-//                        .divide(BigDecimal.valueOf(100), RoundingMode.CEILING)));
         return relationship;
     }
 }

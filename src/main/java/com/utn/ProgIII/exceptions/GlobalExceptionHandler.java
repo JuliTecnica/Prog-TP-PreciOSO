@@ -239,6 +239,15 @@ public class GlobalExceptionHandler {
         return problemDetail;
     }
 
+    @ExceptionHandler({InternalServerError.class})
+    private ProblemDetail handleInternalServerError(InternalServerError e)
+    {
+        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
+        problemDetail.setProperty("timestamp", Instant.now().toString());
+
+        return problemDetail;
+    }
+
 
 
 }

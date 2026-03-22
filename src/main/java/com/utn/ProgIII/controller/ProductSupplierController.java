@@ -1,6 +1,7 @@
 package com.utn.ProgIII.controller;
 
 import com.utn.ProgIII.dto.*;
+import com.utn.ProgIII.exceptions.InternalServerError;
 import com.utn.ProgIII.service.interfaces.ProductSupplierService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -188,8 +189,7 @@ public class ProductSupplierController {
             file.transferTo(new File(tmpdir + "\\" + filename));
             response = productSupplierService.uploadCsv(tmpdir + "\\" + filename, idSupplier);
         } catch (IOException e) {
-            System.out.println("Error subiendo el archivo: " + e.getMessage());
-            return ResponseEntity.internalServerError().build();
+            throw new InternalServerError("Error subiendo el archivo: " + e.getMessage());
         }
 
         return ResponseEntity.ok(response);
@@ -225,8 +225,7 @@ public class ProductSupplierController {
             file.transferTo(new File(tmpdir + "\\" + filename));
             response = productSupplierService.uploadCsv(tmpdir + "\\" + filename, idSupplier, bulkProfitMargin);
         } catch (IOException e) {
-            System.out.println("Error subiendo el archivo: " + e.getMessage());
-            return ResponseEntity.internalServerError().build();
+            throw new InternalServerError("Error subiendo el archivo: " + e.getMessage());
         }
 
         return ResponseEntity.ok(response);

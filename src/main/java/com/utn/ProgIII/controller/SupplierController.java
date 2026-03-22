@@ -16,6 +16,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ProblemDetail;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -50,14 +51,14 @@ public class SupplierController {
     })
     @ApiResponse(responseCode = "400", description = "Error en datos introducidos", content = {
             @Content(
-                    mediaType = "text/plain;charset=UTF-8",
-                    schema = @Schema(example = "(Un mensaje mostrando los errores del usuario)")
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = ProblemDetail.class)
             )
     })
     @ApiResponse(responseCode = "409", description = "Proveedor existente con ese nombre/CUIT", content = {
             @Content(
-                    mediaType = "text/plain;charset=UTF-8",
-                    schema = @Schema(examples = {"El proveedor con ese nombre ya existe en la base de datos", "El proveedor con ese CUIT y existe en la base de datos"})
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = ProblemDetail.class)
             )
     })
     public ResponseEntity<ViewSupplierDTO> addSupplier(
@@ -83,13 +84,13 @@ public class SupplierController {
                             array = @ArraySchema(schema = @Schema(implementation = ViewSupplierDTO.class)))
             })
     @ApiResponse(responseCode = "400", description = "Datos erróneos", content = @Content(
-            mediaType = "text/plain;charset=UTF-8",
-            schema = @Schema(example = "No property 'companyNam' found for type 'Supplier'; Did you mean 'companyName'")
+            mediaType = "application/json",
+            schema = @Schema(implementation = ProblemDetail.class)
     ))
     @ApiResponse(responseCode = "404", description = "No encontrado", content = {
             @Content(
-                    mediaType = "text/plain;charset=UTF-8",
-                    schema = @Schema(example = "No hay proveedores")
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = ProblemDetail.class)
             )
     })
     @Operation(summary = "Busca una página de proveedores", description = "Lista una página de proveedores")
@@ -120,8 +121,8 @@ public class SupplierController {
     })
     @ApiResponse(responseCode = "404", description = "No encontrado", content = {
             @Content(
-                    mediaType = "text/plain;charset=UTF-8",
-                    schema = @Schema(example = "Proveedor no encontrado")
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = ProblemDetail.class)
             )
     })
     @GetMapping("/{id}")
@@ -152,17 +153,17 @@ public class SupplierController {
             schema = @Schema(implementation = ViewSupplierDTO.class)
     ))
     @ApiResponse(responseCode = "400", description = "Error en datos introducidos", content = @Content(
-            mediaType = "text/plain;charset=UTF-8",
-            schema = @Schema(defaultValue = "(Un mensaje mostrando los errores del usuario)")
+            mediaType = "application/json",
+            schema = @Schema(implementation = ProblemDetail.class)
     ))
     @ApiResponse(responseCode = "404", description = "Proveedor no encontrado", content = @Content(
-            mediaType = "text/plain;charset=UTF-8",
-            schema = @Schema(example = "El proveedor no existe")
+            mediaType = "application/json",
+            schema = @Schema(implementation = ProblemDetail.class)
     ))
 
     @ApiResponse(responseCode = "409", description = "Datos de proveedor ya existentes", content = @Content(
-            mediaType = "text/plain;charset=UTF-8",
-            schema = @Schema(description = "Un mensaje de error para el usuario", examples = {"El proveedor con ese nombre ya existe en la base de datos", "El CUIT ingresado ya se encuentra registrado"})
+            mediaType = "application/json",
+            schema = @Schema(implementation = ProblemDetail.class)
     ))
     @PutMapping("/{id}")
     @Operation(summary = "Modifica los datos del proveedor")
@@ -182,8 +183,8 @@ public class SupplierController {
      */
     @ApiResponse(responseCode = "204", description = "Eliminado correctamente", content = @Content())
     @ApiResponse(responseCode = "404", description = "Proveedor No encontrado", content = @Content(
-            mediaType = "text/plain;charset=UTF-8",
-            schema = @Schema(example = "Proveedor no encontrado")
+            mediaType = "application/json",
+            schema = @Schema(implementation = ProblemDetail.class)
     ))
     @DeleteMapping("/{id}")
     @Operation(summary = "Elimina un proveedor según su id")

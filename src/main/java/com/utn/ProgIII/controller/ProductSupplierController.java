@@ -16,6 +16,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ProblemDetail;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -44,12 +45,12 @@ public class ProductSupplierController {
     @Operation(summary = "Crea un ProductSupplier", description = "Crea una relación entre un proveedor y producto")
     @ApiResponse(responseCode = "201", description = "Creado")
     @ApiResponse(responseCode = "400", description = "Datos erróneos", content = @Content(
-            mediaType = "text/plain;charset=UTF-8",
-            schema = @Schema(example = "(Un mensaje que tiene los errores del usuario)")
+            mediaType = "application/json",
+            schema = @Schema(implementation = ProblemDetail.class)
     ))
     @ApiResponse(responseCode = "404", description = "No encontrado o no activo", content = @Content(
-            mediaType = "text/plain;charset=UTF-8",
-            schema = @Schema(example = "(Un mensaje que tiene un error de usuario (producto no activo/existente, proveedor inexistente))")
+            mediaType = "application/json",
+            schema = @Schema(implementation = ProblemDetail.class)
     ))
     public ResponseEntity<ResponseProductSupplierDTO> createProductSupplier(@Valid @RequestBody
             @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "Relación entre proveedor y producto para crear")
@@ -65,8 +66,8 @@ public class ProductSupplierController {
     @PatchMapping("/{id}")
     @ApiResponse(responseCode = "200",description = "Datos modificados")
     @ApiResponse(responseCode = "404",description = "Relación no encontrada", content = @Content(
-            mediaType = "text/plain;charset=UTF-8",
-            schema = @Schema(example = "La relación que quiere editar no se encuentra")
+            mediaType = "application/json",
+            schema = @Schema(implementation = ProblemDetail.class)
     ))
     @Operation(summary = "Modifica los datos de una relación", description = "Modifica el precio y el profit margin de una relación")
     public ResponseEntity<ResponseProductSupplierDTO> modifyProductSupplier(
@@ -117,8 +118,8 @@ public class ProductSupplierController {
                             )
                     }))
     @ApiResponse(responseCode = "404",description = "Proveedor inexistente", content = @Content(
-            mediaType = "text/plain;charset=UTF-8",
-            schema = @Schema(example = "El proveedor no existe")
+            mediaType = "application/json",
+            schema = @Schema(implementation = ProblemDetail.class)
     ))
     @GetMapping("/filter/{companyId}")
     public ResponseEntity<SupplierProductListDTO> listAllProductsBySupplier(Pageable pageable, @PathVariable @Parameter(description = "El id de una empresa") Long companyId, @RequestParam(defaultValue = "oficial",required = false) @Parameter(description = "Un tipo de cotización disponible en dolarapi.com", required = false) String exchange_rate){
@@ -159,8 +160,8 @@ public class ProductSupplierController {
             )
     )
     @ApiResponse(responseCode = "404", description = "Producto desactivado", content = @Content(
-            mediaType = "text/plain;charset=UTF-8",
-            schema = @Schema(example = "El producto está desactivado, y no tendrá precios.")
+            mediaType = "application/json",
+            schema = @Schema(implementation = ProblemDetail.class)
     ))
     public ResponseEntity<ProductPricesDTO> listAllPricesByProduct(@ParameterObject @PageableDefault(size = 10) Pageable paginacion,@PathVariable @Parameter(description = "El ID de un producto", example = "1") Long productId, @RequestParam(defaultValue = "oficial",required = false) @Parameter(description = "Un tipo de cotización disponible en dolarapi.com", required = false) String exchange_rate){
         return ResponseEntity.ok(productSupplierService.listPricesByProduct(paginacion, productId, exchange_rate));
@@ -175,10 +176,13 @@ public class ProductSupplierController {
             schema = @Schema(example = "Productos no subidos:\nProduct 1\nProduct 3")
     ))
     @ApiResponse(responseCode = "404",description = "El proveedor elegido no existe", content = @Content(
-            mediaType = "text/plain;charset=UTF-8",
-            schema = @Schema(example = "El proveedor asignado no existe")
+            mediaType = "application/json",
+            schema = @Schema(implementation = ProblemDetail.class)
     ))
-    @ApiResponse(responseCode = "500",description = "El servidor no pudo procesar el archivo", content = @Content())
+    @ApiResponse(responseCode = "500",description = "El servidor no pudo procesar el archivo", content = @Content(
+            mediaType = "application/json",
+            schema = @Schema(implementation = ProblemDetail.class)
+    ))
     @PostMapping(path = "/upload", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
     public ResponseEntity<String> updateWithFile(@RequestParam("file") MultipartFile file,@RequestParam @Parameter(example = "1", description = "El ID de un proveedor") Long idSupplier) {
         String filename = file.getOriginalFilename();
@@ -205,12 +209,12 @@ public class ProductSupplierController {
             schema = @Schema(example = "Productos no subidos:\nProduct 1\nProduct 3")
     ))
     @ApiResponse(responseCode = "404",description = "El proveedor elegido no existe", content = @Content(
-            mediaType = "text/plain;charset=UTF-8",
-            schema = @Schema(example = "El proveedor asignado no existe")
+            mediaType = "application/json",
+            schema = @Schema(implementation = ProblemDetail.class)
     ))
     @ApiResponse(responseCode = "500",description = "El servidor no pudo procesar el archivo", content = @Content(
-            mediaType = "text/plain;charset=UTF-8",
-            schema = @Schema(example = "Error subiendo el archivo: (mensaje de excepción)")
+            mediaType = "application/json",
+            schema = @Schema(implementation = ProblemDetail.class)
     ))
     @PostMapping(path = "/uploadNonRelatedProducts", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
     public ResponseEntity<String> updateWithFileAndProfitMargin(@RequestParam("file") MultipartFile file,

@@ -1,0 +1,4 @@
+CREATE TABLE category (
+    id_category BIGINT PRIMARY KEY AUTO_INCREMENT NOT NULL ,
+    name VARCHAR(50) NOT NULL
+)

@@ -9,6 +9,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ProblemDetail;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -35,12 +36,12 @@ public class MiscController {
             schema = @Schema(implementation = ViewDolarDTO.class)
     ))
     @ApiResponse(responseCode = "404", description = "Cotización no existente", content = @Content(
-            mediaType = "text/plain;charset=UTF-8",
-            schema = @Schema(example = "Esa cotización no existe")
+            mediaType = "application/json",
+            schema = @Schema(implementation = ProblemDetail.class)
     ))
     @ApiResponse(responseCode = "500",description = "Error interno en el servidor", content = @Content(
-            mediaType = "text/plain;charset=UTF-8",
-            schema = @Schema(example = "Un error inesperado ocurrió en el servicio.")
+            mediaType = "application/json",
+            schema = @Schema(implementation = ProblemDetail.class)
     ))
     public ResponseEntity<ViewDolarDTO> viewDollarPrice(@Parameter(description = "Un tipo de cotización disponible en dolarapi.com",required = false) @RequestParam(required = false, defaultValue = "oficial") String exchange_rate)
     {

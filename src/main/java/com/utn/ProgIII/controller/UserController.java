@@ -17,6 +17,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ProblemDetail;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -47,8 +48,8 @@ public class UserController {
     ))
     @ApiResponse(responseCode = "403", description = "Acceso prohibido/dirección no encontrada", content = @Content())
     @ApiResponse(responseCode = "404",description = "Usuario no encontrado", content = @Content(
-            mediaType = "text/plain;charset=UTF-8",
-            schema = @Schema(example = "Usuario no encontrado")
+            mediaType = "application/json",
+            schema = @Schema(implementation = ProblemDetail.class)
     ))
     @GetMapping("/{id}")
     public ResponseEntity<UserWithCredentialDTO> getUserById(@PathVariable @Parameter(description = "El ID de un usuario") Long id) {
@@ -79,8 +80,8 @@ public class UserController {
     @ApiResponse(responseCode = "403", description = "Acceso prohibido/dirección no encontrada", content = @Content())
     @ApiResponse(responseCode = "404", description = "No encontrado", content = {
             @Content(
-                    mediaType = "text/plain;charset=UTF-8",
-                    schema = @Schema(example = "No hay usuarios")
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = ProblemDetail.class)
             )
     })
     @Operation(summary = "Busca una página de usuarios", description = "Lista una página de usuarios")
@@ -120,13 +121,13 @@ public class UserController {
     @Operation(summary = "Crea un usuario", description = "Crea un usuario con sus credenciales")
     @ApiResponse(responseCode = "201", description = "Usuario creado")
     @ApiResponse(responseCode = "400", description = "Error en datos insertados", content = @Content(
-            mediaType = "text/plain;charset=UTF-8",
-            schema = @Schema(example = "(Un mensaje de los errores del usuario)")
+            mediaType = "application/json",
+            schema = @Schema(implementation = ProblemDetail.class)
     ))
     @ApiResponse(responseCode = "403", description = "Acceso prohibido/dirección no encontrada", content = @Content())
     @ApiResponse(responseCode = "409", description = "Usuario existente por dni", content = @Content(
-            mediaType = "text/plain;charset=UTF-8",
-            schema = @Schema(examples = {"El nombre de usuario ya existe en la base de datos", "El dni ingresado ya se encuentra registrado"})
+            mediaType = "application/json",
+            schema = @Schema(implementation = ProblemDetail.class)
     ))
     @PostMapping()
     public ResponseEntity<UserWithCredentialDTO> createUser(
@@ -147,12 +148,12 @@ public class UserController {
     @Operation(summary = "Actualiza un usuario", description = "Actualiza un usuario con los datos introducidos")
     @ApiResponse(responseCode = "200", description = "Usuario encontrado")
     @ApiResponse(responseCode = "400",description = "Error en datos insertados", content = @Content(
-            mediaType = "text/plain;charset=UTF-8",
-            schema = @Schema(examples = {"El nombre de usuario ya existe en la base de datos", "El dni ingresado ya se encuentra registrado"})
+            mediaType = "application/json",
+            schema = @Schema(implementation = ProblemDetail.class)
     ))
     @ApiResponse(responseCode = "403", description = "Modificaciones no permitidas", content = @Content(
-            mediaType = "text/plain;charset=UTF-8",
-            schema = @Schema(example = "(Un mensaje de error diciendo al administrador que no puede cambiar su nivel de acceso o estado de cuenta)")
+            mediaType = "application/json",
+            schema = @Schema(implementation = ProblemDetail.class)
     ))
     @PutMapping("/{id}")
     public ResponseEntity<UserWithCredentialDTO> updateUser(@PathVariable @Parameter(description = "El id de un usuario", example = "1") Long id,
@@ -172,17 +173,17 @@ public class UserController {
     @Operation(summary = "Elimina (hard) o hace una baja lógica (soft)", description = "Hace una baja lógica o una eliminación del usuario.")
     @ApiResponse(responseCode = "204", description = "Eliminación correcta", content = @Content())
     @ApiResponse(responseCode = "400", description = "Error en datos insertados", content = @Content(
-            mediaType = "text/plain;charset=UTF-8",
-            schema = @Schema(example = "La opción de eliminación no es correcta")
+            mediaType = "application/json",
+            schema = @Schema(implementation = ProblemDetail.class)
     ))
     @ApiResponse(responseCode = "404", description = "Usuario no encontrado", content = @Content(
-            mediaType = "text/plain;charset=UTF-8",
-            schema = @Schema(example = "Usuario no encontrado")
+            mediaType = "application/json",
+            schema = @Schema(implementation = ProblemDetail.class)
     ))
     @ApiResponse(responseCode = "403", description = "Acceso prohibido/dirección no encontrada", content = @Content())
     @ApiResponse(responseCode = "409", description = "Intento de eliminación del usuario logueado", content = @Content(
-            mediaType = "text/plain;charset=UTF-8",
-            schema = @Schema(example = "No podes eliminar tu usuario")
+            mediaType = "application/json",
+            schema = @Schema(implementation = ProblemDetail.class)
     ))
     @DeleteMapping("/{id}")
     public ResponseEntity<?> delete(

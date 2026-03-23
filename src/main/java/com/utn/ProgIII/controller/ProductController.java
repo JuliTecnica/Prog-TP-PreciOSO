@@ -14,6 +14,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ProblemDetail;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -40,12 +41,12 @@ public class ProductController {
     @Operation(summary = "Se agrega un producto", description = "Se agrega un producto con los datos del usuario")
     @ApiResponse(responseCode = "201", description = "Producto creado")
     @ApiResponse(responseCode = "400",description = "Error en datos introducidos", content = @Content(
-            mediaType = "text/plain;charset=UTF-8",
-            schema = @Schema(example = "(un mensaje con todos los errores del usuario)")
+            mediaType = "application/json",
+            schema = @Schema(implementation = ProblemDetail.class)
     ))
     @ApiResponse(responseCode = "409", description = "Producto ya existente", content = @Content(
-            mediaType = "text/plain;charset=UTF-8",
-            schema = @Schema(example = "Ese producto ya existe")
+            mediaType = "application/json",
+            schema = @Schema(implementation = ProblemDetail.class)
     ))
     public ResponseEntity<ProductDTO> addProduct (
             @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "El producto para crear")
@@ -63,8 +64,8 @@ public class ProductController {
     @GetMapping ("/{id}")
     @ApiResponse(responseCode = "200", description = "Producto encontrado")
     @ApiResponse(responseCode = "404", description = "Proveedor no encontrado", content = @Content(
-            mediaType = "text/plain;charset=UTF-8",
-            schema = @Schema(example = "Proveedor no encontrado")
+            mediaType = "application/json",
+            schema = @Schema(implementation = ProblemDetail.class)
     ))
     @Operation(summary = "Se muestra un producto por ID", description = "Se muestra el producto con todos sus datos")
     public ResponseEntity<ProductDTO> getProductById (@PathVariable @Parameter(description = "El ID del producto", example = "1") Long id) {
@@ -89,8 +90,8 @@ public class ProductController {
             array = @ArraySchema(schema = @Schema(implementation = ProductDTO.class))
     ))
     @ApiResponse(responseCode = "404", description = "Productos no encontrados", content = @Content(
-            mediaType = "text/plain;charset=UTF-8",
-            schema = @Schema(example = "No hay resultados")
+            mediaType = "application/json",
+            schema = @Schema(implementation = ProblemDetail.class)
     ))
     public ResponseEntity<Page<ProductDTO>> getAllProduct (@ParameterObject @PageableDefault(size = 10) Pageable paginacion){
         Page<ProductDTO> response = productService.getAllProduct(paginacion);
@@ -105,8 +106,8 @@ public class ProductController {
             array = @ArraySchema(schema = @Schema(implementation = List.class)
     )))
     @ApiResponse(responseCode = "404", description = "Productos no encontrados", content = @Content(
-            mediaType = "text/plain;charset=UTF-8",
-            schema = @Schema(example = "No hay resultados")
+            mediaType = "application/json",
+            schema = @Schema(implementation = ProblemDetail.class)
     ))
     public ResponseEntity<List<ProductDTO>> getAllProductsAsList(){
         return ResponseEntity.ok(productService.getAllProductsAsList());
@@ -120,12 +121,12 @@ public class ProductController {
             array = @ArraySchema(schema = @Schema(implementation = ProductDTO.class))
     ))
     @ApiResponse(responseCode = "400", description = "Error de datos introducidos por el usuario", content = @Content(
-            mediaType = "text/plain;charset=UTF-8",
-            schema = @Schema(example = "El estado ingresado es inválido")
+            mediaType = "application/json",
+            schema = @Schema(implementation = ProblemDetail.class)
     ))
     @ApiResponse(responseCode = "404", description = "Productos no encontrados", content = @Content(
-            mediaType = "text/plain;charset=UTF-8",
-            schema = @Schema(example = "No hay resultados")
+            mediaType = "application/json",
+            schema = @Schema(implementation = ProblemDetail.class)
     ))
     @Operation(summary = "Se muestra una lista de productos por su estado", description = "Se muestra una lista según su estado")
     public ResponseEntity<Page<ProductDTO>> getAllProductByStatus(@PathVariable @Parameter(description = "El estado de un producto (ENABLED, DISABLED)", example = "ENABLED") String status,@ParameterObject @PageableDefault(size = 10) Pageable paginacion){
@@ -140,8 +141,8 @@ public class ProductController {
     @Operation(summary = "Se muestra una lista de productos por nombres", description = "Se muestra una lista de productos por nombres")
     @ApiResponse(responseCode = "200", description = "Lista de productos según nombre")
     @ApiResponse(responseCode = "404",description = "Productos no encontrados", content = @Content(
-            mediaType = "text/plain;charset=UTF-8",
-            schema = @Schema(example = "No hay resultados")
+            mediaType = "application/json",
+            schema = @Schema(implementation = ProblemDetail.class)
     ))
     public ResponseEntity<Page<ProductDTO>> getProductByName(@PathVariable @Parameter(description = "El nombre de un producto", example = "Manzana") String name,@ParameterObject @PageableDefault(size = 10) Pageable paginacion){
 
@@ -187,12 +188,12 @@ public class ProductController {
     @Operation(summary = "Se actualiza los datos de un producto")
     @ApiResponse(responseCode = "200",description = "Actualización completa")
     @ApiResponse(responseCode = "400",description = "Datos mal colocados", content = @Content(
-            mediaType = "text/plain;charset=UTF-8",
-            schema = @Schema(example = "(un mensaje con todos los errores del usuario)")
+            mediaType = "application/json",
+            schema = @Schema(implementation = ProblemDetail.class)
     ))
     @ApiResponse(responseCode = "404", description = "Producto no encontrado", content = @Content(
-            mediaType = "text/plain;charset=UTF-8",
-            schema = @Schema(example = "Producto no encontrado")
+            mediaType = "application/json",
+            schema = @Schema(implementation = ProblemDetail.class)
     ))
 
     public ProductDTO update (@PathVariable @Parameter(description = "El ID de un producto", example = "1") Long id, @RequestBody ProductDTO modifyProductDTO){
@@ -204,8 +205,8 @@ public class ProductController {
     @DeleteMapping("/{id}")
     @ApiResponse(responseCode = "204", description = "Eliminado correctamente", content = @Content())
     @ApiResponse(responseCode = "404", description = "Producto no existe", content = @Content(
-            mediaType = "text/plain;charset=UTF-8",
-            schema = @Schema(example = "Producto no encontrado")
+            mediaType = "application/json",
+            schema = @Schema(implementation = ProblemDetail.class)
     ))
     @Operation(summary = "Se hace una baja lógica de un producto", description = "Se hace una baja lógica según su id")
     public ResponseEntity<?> delete(@PathVariable Long id) {

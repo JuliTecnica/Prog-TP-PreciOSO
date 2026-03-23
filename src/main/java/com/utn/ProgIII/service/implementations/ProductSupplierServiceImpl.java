@@ -20,9 +20,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
-import java.math.RoundingMode;
-import java.util.ArrayList;
-import java.util.List;
 
 @Service
 /*
@@ -193,41 +190,24 @@ public class ProductSupplierServiceImpl implements ProductSupplierService {
 
     /**
      * Se usa para modificar relaciones existentes
-     * @param filepath Path interno del archivo
+     *
+     * @param filepath   Path interno del archivo
      * @param idSupplier El ID del proveedor para modificar sus relaciones
+     * @param mode El modo de cambio en para usar en el csv
      */
     @Override
-    public NonAffectedProductsListDTO uploadCsv(String filepath, Long idSupplier) {
+    public NonAffectedProductsListDTO uploadCsv(String filepath, Long idSupplier, String mode) {
 
         if(!supplierRepository.existsById(idSupplier))
         {
             throw new SupplierNotFoundException("El proveedor asignado no existe");
         }
 
-        return csvReader.uploadToDatabase(filepath,idSupplier);
-    }
-
-    /**
-     * Se usa para cargar relaciones nuevas y modifican el precio de las existentes
-     * @param filepath Path interno del archivo
-     * @param idSupplier El ID del proveedor para modificar sus relaciones
-     * @param bulkProfitMargin El margen de ganancia
-     * @return Un mensaje de error diciendo que productos no fueron cargados
-     * @see CsvReader
-     */
-    @Override
-    public NonAffectedProductsListDTO uploadCsv(String filepath, Long idSupplier, BigDecimal bulkProfitMargin) {
-
-        if(!supplierRepository.existsById(idSupplier))
-        {
-            throw new SupplierNotFoundException("El proveedor asignado no existe");
-        }
-
-        if (0 > bulkProfitMargin.compareTo(BigDecimal.valueOf(0))) {
-            throw new InvalidRequestException("El porcentaje de ganancia no es válido");
-        }
-
-        return csvReader.uploadToDatabase(filepath,idSupplier,bulkProfitMargin);
+        return switch (mode) {
+            case "modify" -> csvReader.modifyRels(filepath, idSupplier);
+            case "add" -> csvReader.createRels(filepath, idSupplier);
+            default -> throw new BadRequestException("Esta opción no existe!");
+        };
     }
 
     @Override

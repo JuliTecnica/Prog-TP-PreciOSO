@@ -1,0 +1,10 @@
+ALTER TABLE
+    credential_audit
+MODIFY COLUMN
+    role enum('ADMIN','EMPLOYEE','MANAGER','CUSTOMER') DEFAULT NULL;
+
+
+ALTER TABLE
+    credential
+MODIFY COLUMN
+    role enum('ADMIN','EMPLOYEE','MANAGER','CUSTOMER') DEFAULT NULL;

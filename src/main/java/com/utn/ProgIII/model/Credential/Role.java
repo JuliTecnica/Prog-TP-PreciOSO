@@ -9,5 +9,6 @@ import io.swagger.v3.oas.annotations.media.Schema;
 public enum Role {
     ADMIN,
     MANAGER,
-    EMPLOYEE
+    EMPLOYEE,
+    CUSTOMER
 }

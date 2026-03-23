@@ -73,7 +73,7 @@ public class UserServiceImpl implements UserService {
         User user = userMapper.toEntityNoRoleOrStatus(dto);
 
         user.setStatus(UserStatus.ENABLED);
-        user.getCredential().setRole(Role.EMPLOYEE); // PROVISORIO!!!
+        user.getCredential().setRole(Role.CUSTOMER);
 
         userValidations.validateUserByDni(dto.dni());
         credentialValidations.validateUsernameNotExists(dto.credential().username());

@@ -120,6 +120,24 @@
 
         <!-- Local Library end -->
 
+        <!-- database migration library -->
+
+        <dependency>
+            <groupId>org.flywaydb</groupId>
+            <artifactId>flyway-core</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.flywaydb</groupId>
+            <artifactId>flyway-mysql</artifactId>
+        </dependency>
+
+
+
+        <!-- database migration library end -->
+
+
+
     </dependencies>
 
 

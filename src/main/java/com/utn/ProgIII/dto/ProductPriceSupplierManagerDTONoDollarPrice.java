@@ -13,10 +13,10 @@ public record ProductPriceSupplierManagerDTONoDollarPrice(
         String companyName,
         @Schema(example = "100")
         BigDecimal cost,
-        @Schema(example = "100")
-        BigDecimal profitMargin,
-        @Schema(example = "200")
-        BigDecimal price,
+//        @Schema(example = "100")
+//        BigDecimal profitMargin,
+//        @Schema(example = "200")
+//        BigDecimal price,
         @Schema(example = "not available")
         String dollarPrice
 ) {

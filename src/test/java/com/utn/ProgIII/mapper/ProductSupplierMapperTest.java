@@ -52,12 +52,11 @@ public class ProductSupplierMapperTest {
     @Test
     void fromEntityToDto_mustReturnDTO_whenReceiveAnEntity(){
         BigDecimal cost =  new BigDecimal("3.2");
-        BigDecimal profitMargin = new BigDecimal("1.2");
+
         productSupplier = new ProductSupplier(
                 supplier,
                 product,
-                cost,
-                profitMargin);
+                cost);
 
         productSupplier.setIdProductSupplier(1L);
 
@@ -69,8 +68,6 @@ public class ProductSupplierMapperTest {
         assertEquals(responseProductSupplierDTO.productName(), product.getName());
         assertEquals(responseProductSupplierDTO.supplierName(), supplier.getCompanyName());
         assertEquals(responseProductSupplierDTO.cost(), productSupplier.getCost());
-        assertEquals(responseProductSupplierDTO.profitMargin(), productSupplier.getProfitMargin());
-        assertEquals(responseProductSupplierDTO.price(), productSupplier.getPrice());
 
     }
 

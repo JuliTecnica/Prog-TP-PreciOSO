@@ -82,8 +82,7 @@ public class ProductSupplierServiceImpl implements ProductSupplierService {
         ProductSupplier productSupplier = new ProductSupplier(
                 supplier,
                 product,
-                createProductSupplierDTO.cost(),
-                createProductSupplierDTO.profitMargin()
+                createProductSupplierDTO.cost()
         );
 
         productSupplierValidations.validateRelationship(productSupplier);
@@ -115,11 +114,8 @@ public class ProductSupplierServiceImpl implements ProductSupplierService {
                 .orElseThrow(() -> new ProductSupplierNotExistException("La relación que quiere editar no se encuentra"));
 
         BigDecimal newCost = updateProductSupplierDTO.cost();
-        BigDecimal newProfitMargin = updateProductSupplierDTO.profitMargin();
 
         productSupplier.setCost(newCost);
-        productSupplier.setProfitMargin(newProfitMargin);
-        productSupplier.setPrice(newCost.add(newCost.multiply(newProfitMargin).divide(BigDecimal.valueOf(100),2,RoundingMode.CEILING)));
 
         productSupplierRepository.save(productSupplier);
 
@@ -220,7 +216,7 @@ public class ProductSupplierServiceImpl implements ProductSupplierService {
      * @see CsvReader
      */
     @Override
-    public String  uploadCsv(String filepath, Long idSupplier, BigDecimal bulkProfitMargin) {
+    public String uploadCsv(String filepath, Long idSupplier, BigDecimal bulkProfitMargin) {
 
         if(!supplierRepository.existsById(idSupplier))
         {

@@ -8,7 +8,8 @@ public record ExtendedProductEmployeeDTO(
         @Schema(example = "1")
         Long idProduct,
         @Schema(example = "Pasas de uva")
-        String name,
-        @Schema(example = "260")
-        BigDecimal price) {
+        String name
+//        @Schema(example = "260")
+//        BigDecimal price
+) {
 }

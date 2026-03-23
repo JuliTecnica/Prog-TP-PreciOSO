@@ -1,7 +1,7 @@
 package com.utn.ProgIII.controller;
 
 import com.utn.ProgIII.dto.CreateUserDTO;
-import com.utn.ProgIII.dto.UserWithCredentialDTO;
+import com.utn.ProgIII.dto.CreateUserNoAuthDTO;import com.utn.ProgIII.dto.UserWithCredentialDTO;
 import com.utn.ProgIII.dto.ViewSupplierDTO;
 import com.utn.ProgIII.service.interfaces.UserService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -135,6 +135,31 @@ public class UserController {
             @RequestBody CreateUserDTO dto
     ) {
         UserWithCredentialDTO response = userService.createUserWithCredential(dto);
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    }
+
+    /**
+     * Se crea un nuevo usuario activo y credenciales con el rol más bajo en el sistema. Para utilizar en registros públicos.
+     * @param dto El objeto de transferencia recibido desde la request
+     * @return Un DTO para mostrar los datos cargados y su id correspondiente, como una respuesta
+     */
+    @Operation(summary = "Crea un usuario", description = "Crea un usuario con sus credenciales")
+    @ApiResponse(responseCode = "201", description = "Usuario creado")
+    @ApiResponse(responseCode = "400", description = "Error en datos insertados", content = @Content(
+            mediaType = "text/plain;charset=UTF-8",
+            schema = @Schema(example = "(Un mensaje de los errores del usuario)")
+    ))
+    @ApiResponse(responseCode = "403", description = "Acceso prohibido/dirección no encontrada", content = @Content())
+    @ApiResponse(responseCode = "409", description = "Usuario existente por dni", content = @Content(
+            mediaType = "text/plain;charset=UTF-8",
+            schema = @Schema(examples = {"El nombre de usuario ya existe en la base de datos", "El dni ingresado ya se encuentra registrado"})
+    ))
+    @PostMapping("/register")
+    public ResponseEntity<UserWithCredentialDTO> createUserNoAuth(
+            @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "Los datos del usuario nuevo")
+            @RequestBody CreateUserNoAuthDTO dto
+    ) {
+        UserWithCredentialDTO response = userService.createUserNoAuth(dto);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 

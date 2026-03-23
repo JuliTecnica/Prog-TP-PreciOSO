@@ -1,6 +1,7 @@
 package com.utn.ProgIII.service.interfaces;
 
 import com.utn.ProgIII.dto.CreateUserDTO;
+import com.utn.ProgIII.dto.CreateUserNoAuthDTO;
 import com.utn.ProgIII.dto.UserWithCredentialDTO;
 import com.utn.ProgIII.dto.ViewSupplierDTO;
 import org.springframework.data.domain.Page;
@@ -12,6 +13,7 @@ import java.util.List;
  * Interfaz que dicta los comportamientos que debe incorporar el servicio de usuarios
  */
 public interface UserService {
+    UserWithCredentialDTO createUserNoAuth(CreateUserNoAuthDTO dto);
     UserWithCredentialDTO createUserWithCredential(CreateUserDTO dto);
     UserWithCredentialDTO getUserById(Long id);
     Page<UserWithCredentialDTO> filterUsers(String role, String status,Pageable pageable);

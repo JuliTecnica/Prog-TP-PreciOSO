@@ -89,6 +89,7 @@ public class SecurityConfig {
         return RoleHierarchyImpl.withDefaultRolePrefix()
                 .role("ADMIN").implies("MANAGER")
                 .role("MANAGER").implies("EMPLOYEE")
+                .role("EMPLOYEE").implies("CUSTOMER")
                 .build();
     }
 

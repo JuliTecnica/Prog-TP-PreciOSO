@@ -20,6 +20,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Component
 /*
@@ -72,7 +73,7 @@ public class CsvReader {
         List<ProductInfoFromCsvDTO> failedUploads = new ArrayList<>();
 
         try {
-            uploads = readFile(csvFilePath).stream().toList();
+            uploads = readFile(csvFilePath).stream().filter(this::IsProductInfoValid).toList();
             Supplier supplierData = supplierRepository.getReferenceById(supplierId);
 
             for (ProductInfoFromCsvDTO productUpdateInfo: uploads) {
@@ -105,7 +106,7 @@ public class CsvReader {
         List<ProductInfoFromCsvDTO> uploads;
         List<ProductInfoFromCsvDTO> failedUploads = new ArrayList<>();
         try {
-            uploads = readFile(csvFilePath).stream().toList();
+            uploads = readFile(csvFilePath).stream().filter(this::IsProductInfoValid).toList();
             Supplier supplierData = supplierRepository.getReferenceById(supplierId);
 
             for (ProductInfoFromCsvDTO productUpdateInfo: uploads) {
@@ -138,5 +139,10 @@ public class CsvReader {
     public ProductSupplier updateRelationshipPricing(ProductInfoFromCsvDTO productUpdateInfo, ProductSupplier relationship) {
         relationship.setCost(productUpdateInfo.cost());
         return relationship;
+    }
+
+    private boolean IsProductInfoValid(ProductInfoFromCsvDTO productInfoFromCsvDTO)
+    {
+        return (productInfoFromCsvDTO.name() != null) && (productInfoFromCsvDTO.cost() != null);
     }
 }

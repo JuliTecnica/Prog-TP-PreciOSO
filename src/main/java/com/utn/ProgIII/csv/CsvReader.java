@@ -3,6 +3,7 @@ package com.utn.ProgIII.csv;
 import com.fasterxml.jackson.databind.MappingIterator;
 import com.fasterxml.jackson.dataformat.csv.CsvMapper;
 import com.fasterxml.jackson.dataformat.csv.CsvSchema;
+import com.utn.ProgIII.dto.NonAffectedProductsListDTO;
 import com.utn.ProgIII.dto.ProductInfoFromCsvDTO;
 import com.utn.ProgIII.exceptions.SupplierNotFoundException;
 import com.utn.ProgIII.model.Product.Product;
@@ -17,8 +18,6 @@ import org.springframework.stereotype.Component;
 
 import java.io.File;
 import java.io.IOException;
-import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -67,8 +66,8 @@ public class CsvReader {
      * @param supplierId El proveedor que se le actualizaran las relaciones
      * @return Un mensaje de error que lista los productos que no fueron actualizados
      */
-    public String uploadToDatabase(String csvFilePath, Long supplierId) {
-        StringBuilder message = new StringBuilder("Productos no subidos: \n");
+    public NonAffectedProductsListDTO modifyRels(String csvFilePath, Long supplierId) {
+        String message = "Productos no modificados";
         List<ProductInfoFromCsvDTO> uploads;
         List<ProductInfoFromCsvDTO> failedUploads = new ArrayList<>();
 
@@ -90,19 +89,19 @@ public class CsvReader {
             System.out.println("Error procesando el archivo: " + e.getMessage());
         }
 
-        failedUploads.forEach(failedUpload -> message.append(failedUpload.name()).append("\n"));
-        return message.toString();
+        return new NonAffectedProductsListDTO(message,failedUploads);
     }
 
     /**
-     * Carga relaciones nuevas en caso de que no existan entre un producto y proveedor, cambia el costo de las existentes
+     * Carga relaciones nuevas en caso de que no existan entre un producto y proveedor
+     *
      * @param csvFilePath El camino interno del archivo
-     * @param supplierId El proveedor que se le actualizaran las relaciones
-     * @param bulkProfitMargin El margen de ganancia con el que se cargan las nuevas relaciones
+     * @param supplierId  El proveedor que se le actualizaran las relaciones
      * @return Un mensaje de error diciendo que productos no fueron cargados
      */
-    public String uploadToDatabase(String csvFilePath, Long supplierId, BigDecimal bulkProfitMargin) {
-        StringBuilder message = new StringBuilder("Productos no subidos: \n");
+    public NonAffectedProductsListDTO createRels(String csvFilePath, Long supplierId) {
+
+        String message = "Productos no existentes / ya cargados";
         List<ProductInfoFromCsvDTO> uploads;
         List<ProductInfoFromCsvDTO> failedUploads = new ArrayList<>();
         try {
@@ -112,16 +111,14 @@ public class CsvReader {
             for (ProductInfoFromCsvDTO productUpdateInfo: uploads) {
                 Product productData = productRepository.getByName(productUpdateInfo.name());
                 ProductSupplier relationship = productSupplierRepository.getByProductAndSupplier(productData,supplierData);
-                if (productData != null && productData.getStatus().equals(ProductStatus.ENABLED)) {
-                    if (relationship == null) {
-                        relationship = new ProductSupplier(supplierData,productData,productUpdateInfo.cost());
-                    } else {
-                        relationship = updateRelationshipPricing(productUpdateInfo, relationship);
-                    }
+
+                if (productData != null && productData.getStatus().equals(ProductStatus.ENABLED) && relationship == null) {
+                    relationship = new ProductSupplier(supplierData,productData,productUpdateInfo.cost());
                     productSupplierRepository.save(relationship);
                 } else {
                     failedUploads.add(productUpdateInfo);
                 }
+
             }
         } catch (IOException e) {
             System.out.println("Error procesando el archivo: " + e.getMessage());
@@ -129,8 +126,7 @@ public class CsvReader {
             throw new SupplierNotFoundException("El proveedor asignado no existe");
         }
 
-        failedUploads.forEach(failedUpload -> message.append(failedUpload.name()).append("\n"));
-        return message.toString();
+        return new NonAffectedProductsListDTO(message,failedUploads );
     }
 
     /**

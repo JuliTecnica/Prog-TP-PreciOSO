@@ -1,11 +1,7 @@
 package com.utn.ProgIII.service.interfaces;
 
 import com.utn.ProgIII.dto.*;
-import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.web.PageableDefault;
-
-import java.math.BigDecimal;
 
 public interface ProductSupplierService {
 
@@ -15,6 +11,5 @@ public interface ProductSupplierService {
     void deleteProductSupplier(Long idProductSupplier);
     SupplierProductListDTO listProductsBySupplier(Pageable pageable, Long companyName, String exchange_rate);
     ProductPricesDTO listPricesByProduct(Pageable pageable, Long idProduct, String exchange_rate);
-    String uploadCsv(String filepath, Long idSupplier);
-    String uploadCsv(String filepath, Long idSupplier, BigDecimal bulkProfitMargin);
+    NonAffectedProductsListDTO uploadCsv(String filepath, Long idSupplier, String mode);
 }

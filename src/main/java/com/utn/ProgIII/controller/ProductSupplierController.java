@@ -23,7 +23,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
-import java.math.BigDecimal;
 import java.nio.file.Files;
 
 /**
@@ -173,7 +172,19 @@ public class ProductSupplierController {
                     "productos que no pudieron ser cargados")
     @ApiResponse(responseCode = "200",description = "Actualización realizada, devuelve un listado con aquellos productos que no pudieron ser cargados", content = @Content(
             mediaType = "text/plain;charset=UTF-8",
-            schema = @Schema(example = "Productos no subidos:\nProduct 1\nProduct 3")
+            schema = @Schema(example = "{\n" +
+                    "    \"message\": \"Productos no subidos\",\n" +
+                    "    \"nonAffectedProducts\": [\n" +
+                    "        {\n" +
+                    "            \"nombre\": \"Product 9999\",\n" +
+                    "            \"precio\": 15\n" +
+                    "        },\n" +
+                    "        {\n" +
+                    "            \"nombre\": \"Semillas de tomate trituradas\",\n" +
+                    "            \"precio\": 23\n" +
+                    "        }\n" +
+                    "    ]\n" +
+                    "}")
     ))
     @ApiResponse(responseCode = "404",description = "El proveedor elegido no existe", content = @Content(
             mediaType = "application/json",
@@ -184,50 +195,14 @@ public class ProductSupplierController {
             schema = @Schema(implementation = ProblemDetail.class)
     ))
     @PostMapping(path = "/upload", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
-    public ResponseEntity<String> updateWithFile(@RequestParam("file") MultipartFile file,@RequestParam @Parameter(example = "1", description = "El ID de un proveedor") Long idSupplier) {
+    public ResponseEntity<NonAffectedProductsListDTO> updateWithFile(@RequestParam("file") MultipartFile file,@RequestParam @Parameter(example = "1", description = "El ID de un proveedor") Long idSupplier, @Parameter(example = "modify/add") String mode) {
         String filename = file.getOriginalFilename();
-        String response;
+        NonAffectedProductsListDTO response;
 
         try {
             String tmpdir = Files.createTempDirectory("tmpDirPrefix").toFile().getAbsolutePath();
             file.transferTo(new File(tmpdir + "\\" + filename));
-            response = productSupplierService.uploadCsv(tmpdir + "\\" + filename, idSupplier);
-        } catch (IOException e) {
-            throw new InternalServerError("Error subiendo el archivo: " + e.getMessage());
-        }
-
-        return ResponseEntity.ok(response);
-    }
-
-
-    @Operation(summary = "Actualiza los precios de los productos de un proveedor masivamente y vincula productos sin relación existente, ignora aquellos que estén desactivados",
-            description = "Actualiza los precios de los productos de un proveedor por medio de una lista en formato .csv, " +
-                    "y carga nuevas entradas con un porcentaje de ganancia definido si aún no están relacionados. Finalmente, devuelve una lista con aquellos " +
-                    "productos que no pudieron ser cargados")
-    @ApiResponse(responseCode = "200",description = "Actualización realizada, devuelve listado con aquellos productos que no pudieron ser cargados (productos desactivados o no existentes)", content = @Content(
-            mediaType = "text/plain;charset=UTF-8",
-            schema = @Schema(example = "Productos no subidos:\nProduct 1\nProduct 3")
-    ))
-    @ApiResponse(responseCode = "404",description = "El proveedor elegido no existe", content = @Content(
-            mediaType = "application/json",
-            schema = @Schema(implementation = ProblemDetail.class)
-    ))
-    @ApiResponse(responseCode = "500",description = "El servidor no pudo procesar el archivo", content = @Content(
-            mediaType = "application/json",
-            schema = @Schema(implementation = ProblemDetail.class)
-    ))
-    @PostMapping(path = "/uploadNonRelatedProducts", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
-    public ResponseEntity<String> updateWithFileAndProfitMargin(@RequestParam("file") MultipartFile file,
-                                                                @RequestParam @Parameter(example = "1", description = "El ID de un proveedor") Long idSupplier,
-                                                                @RequestParam(required = false) @Parameter(example = "20", description = "El porcentaje de margen de ganancia") BigDecimal bulkProfitMargin) {
-        String filename = file.getOriginalFilename();
-        String response;
-        if (bulkProfitMargin == null) bulkProfitMargin = BigDecimal.valueOf(0);
-
-        try {
-            String tmpdir = Files.createTempDirectory("tmpDirPrefix").toFile().getAbsolutePath();
-            file.transferTo(new File(tmpdir + "\\" + filename));
-            response = productSupplierService.uploadCsv(tmpdir + "\\" + filename, idSupplier, bulkProfitMargin);
+            response = productSupplierService.uploadCsv(tmpdir + "\\" + filename, idSupplier, mode);
         } catch (IOException e) {
             throw new InternalServerError("Error subiendo el archivo: " + e.getMessage());
         }

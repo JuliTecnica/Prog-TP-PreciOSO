@@ -18,7 +18,7 @@ public interface ProductSupplierRepository extends JpaRepository<ProductSupplier
 //    todo: todos los metodos que necesitan el precio con el precio del dolar van a quedar raros, por que ahora necesitamos extraer el precio de otro lado
 
     @Query("SELECT NEW com.utn.ProgIII.dto.ExtendedProductManagerDTO(" +
-            "ps.idProductSupplier,p.idProduct, p.name, ps.cost, :dollarPrice) " +
+            "ps.idProductSupplier,p.idProduct, p.name, ps.cost, ps.cost/:dollarPrice) " +
             "FROM ProductSupplier ps JOIN ps.product p " +
             "WHERE ps.supplier.idSupplier = :idSupplier")
     Page<ExtendedProductManagerDTO> productsBySupplierManager(Pageable pageable, @Param("idSupplier") Long idSupplier, @Param("dollarPrice") BigDecimal dollarPrice);
@@ -38,7 +38,7 @@ public interface ProductSupplierRepository extends JpaRepository<ProductSupplier
 
 
     @Query("SELECT NEW com.utn.ProgIII.dto.ProductPriceSupplierManagerDTO(" +
-            "ps.idProductSupplier,s.idSupplier, s.companyName, ps.cost, :dollarPrice) " +
+            "ps.idProductSupplier,s.idSupplier, s.companyName, ps.cost, ps.cost/:dollarPrice) " +
             "FROM ProductSupplier ps JOIN ps.supplier s " +
             "WHERE ps.product.idProduct = :idProduct")
     Page<ProductPriceSupplierManagerDTO> listPricesByProductManager(Pageable pageable, @Param("idProduct") Long idProduct, @Param("dollarPrice") BigDecimal dollarPrice);

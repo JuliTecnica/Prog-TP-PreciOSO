@@ -37,5 +37,5 @@ public class Product {
 
     private Float profitMargin;
 
-    private Float stock;
+    private Integer stock;
 }

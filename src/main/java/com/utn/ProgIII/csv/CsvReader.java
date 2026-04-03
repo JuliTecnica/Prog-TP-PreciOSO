@@ -62,7 +62,7 @@ public class CsvReader {
 
         for(Map<String,String> item : iterator.readAll())
         {
-            if(item.containsKey("precio") && item.containsKey("nombre"))
+            if(containsValues(item))
             {
                 var product = new ProductInfoFromCsvDTO(
                         item.get("nombre"),
@@ -166,5 +166,11 @@ public class CsvReader {
     private boolean IsProductInfoValid(ProductInfoFromCsvDTO productInfoFromCsvDTO)
     {
         return (productInfoFromCsvDTO.name() != null) && (productInfoFromCsvDTO.cost() != null);
+    }
+
+
+    static private boolean containsValues(Map<String,String> item)
+    {
+        return item.containsKey("precio") && item.containsKey("nombre");
     }
 }

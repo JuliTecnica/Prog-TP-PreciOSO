@@ -16,5 +16,5 @@ public record ProductDTO (
         @Schema(example = "0.4")
         Float profitMargin,
         @Schema(example = "1.5")
-        Float stock) {
+        Integer stock) {
 }

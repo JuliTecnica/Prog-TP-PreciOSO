@@ -24,7 +24,7 @@ public class ProductMapper {
         String name = product.getName();
         String status = product.getStatus().toString();
         Float profitMargin = product.getProfitMargin();
-        Float stock = product.getStock();
+        Integer stock = product.getStock();
 
         return new ProductDTO(idProduct,name,status, profitMargin, stock);
     }

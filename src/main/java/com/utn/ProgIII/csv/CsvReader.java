@@ -2,9 +2,11 @@ package com.utn.ProgIII.csv;
 
 import com.fasterxml.jackson.databind.MappingIterator;
 import com.fasterxml.jackson.dataformat.csv.CsvMapper;
+import com.fasterxml.jackson.dataformat.csv.CsvParser;
 import com.fasterxml.jackson.dataformat.csv.CsvSchema;
 import com.utn.ProgIII.dto.NonAffectedProductsListDTO;
 import com.utn.ProgIII.dto.ProductInfoFromCsvDTO;
+import com.utn.ProgIII.exceptions.BadRequestException;
 import com.utn.ProgIII.exceptions.SupplierNotFoundException;
 import com.utn.ProgIII.model.Product.Product;
 import com.utn.ProgIII.model.Product.ProductStatus;
@@ -18,8 +20,10 @@ import org.springframework.stereotype.Component;
 
 import java.io.File;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @Component
 /*
@@ -44,20 +48,39 @@ public class CsvReader {
      */
     public static List<ProductInfoFromCsvDTO> readFile(String path) throws IOException {
         File csvFile = new File(path);
-        CsvSchema schema = CsvSchema.builder()
-                .addColumn("id")
-                .addColumn("nombre")
-                .addColumn("precio")
-                .setSkipFirstDataRow(true)
-                .build();
+
+        CsvSchema schema = CsvSchema.emptySchema().withHeader();
 
         CsvMapper mapper = new CsvMapper();
-        MappingIterator<ProductInfoFromCsvDTO> productIterator = mapper
-                .readerFor(ProductInfoFromCsvDTO.class)
+        MappingIterator<Map<String,String>> iterator = mapper
+                .readerFor(Map.class)
                 .with(schema)
                 .readValues(csvFile);
 
-        return productIterator.readAll();
+
+        List<ProductInfoFromCsvDTO> item_list = new ArrayList<ProductInfoFromCsvDTO>();
+
+        for(Map<String,String> item : iterator.readAll())
+        {
+            if(containsValues(item))
+            {
+                var product = new ProductInfoFromCsvDTO(
+                        item.get("nombre"),
+                        new BigDecimal(item.get("precio"))
+                );
+
+                item_list.add(product);
+            } else {
+                throw new BadRequestException("El schema del archivo no es correcto!");
+            }
+
+        }
+
+
+
+
+
+        return item_list;
     }
 
     /**
@@ -143,5 +166,11 @@ public class CsvReader {
     private boolean IsProductInfoValid(ProductInfoFromCsvDTO productInfoFromCsvDTO)
     {
         return (productInfoFromCsvDTO.name() != null) && (productInfoFromCsvDTO.cost() != null);
+    }
+
+
+    static private boolean containsValues(Map<String,String> item)
+    {
+        return item.containsKey("precio") && item.containsKey("nombre");
     }
 }

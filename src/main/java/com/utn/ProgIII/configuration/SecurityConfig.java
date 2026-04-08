@@ -54,6 +54,11 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.DELETE, "/suppliers/**").hasRole("MANAGER")
                         .requestMatchers(HttpMethod.GET, "/suppliers/**").hasRole("EMPLOYEE")
 
+                        .requestMatchers(HttpMethod.POST, "/categories/**").hasRole("MANAGER")
+                        .requestMatchers(HttpMethod.DELETE, "/categories/**").hasRole("MANAGER")
+                        .requestMatchers(HttpMethod.PUT, "/categories/**").hasRole("MANAGER")
+                        .requestMatchers(HttpMethod.GET, "/categories/**").hasRole("CUSTOMER")
+
                         .requestMatchers(HttpMethod.GET, "/misc/dollar").hasRole("MANAGER")
 
                         .requestMatchers(HttpMethod.GET, "/enums/**").permitAll()

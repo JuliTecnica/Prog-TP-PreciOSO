@@ -1,6 +1,6 @@
 package com.utn.ProgIII.mapper;
 
-import com.utn.ProgIII.dto.ProductDTO;
+import com.utn.ProgIII.dto.CreateProductDTO;
 import com.utn.ProgIII.model.Product.Product;
 import com.utn.ProgIII.model.Product.ProductStatus;
 import jakarta.validation.ConstraintViolation;
@@ -36,7 +36,7 @@ class ProductMapperTest {
                 .status(ProductStatus.ENABLED)
                 .build();
 
-        ProductDTO productDTO = productMapper.toProductDTO(product);
+        CreateProductDTO productDTO = productMapper.toProductDTO(product);
 
         assertThat(productDTO)
                 .hasNoNullFieldsOrProperties()
@@ -49,7 +49,7 @@ class ProductMapperTest {
 
     @Test
     void dtoToProduct_AllFieldsMappedFine() {
-        ProductDTO productDTO = ProductDTO.builder()
+        CreateProductDTO productDTO = CreateProductDTO.builder()
                 .name ("product")
                 .status("ENABLED")
                 .build();
@@ -69,7 +69,7 @@ class ProductMapperTest {
     @Test
     void dtoToProduct_NameIsNull() {
 
-        ProductDTO productDTO = ProductDTO.builder()
+        CreateProductDTO productDTO = CreateProductDTO.builder()
                 .name(null)
                 .status("ENABLED")
                 .build();
@@ -82,7 +82,7 @@ class ProductMapperTest {
 
     @Test
     void dtoToProduct_NameIsTooShort() {
-        ProductDTO productDTO = ProductDTO.builder()
+        CreateProductDTO productDTO = CreateProductDTO.builder()
                 .name("ab")
                 .status("ENABLED")
                 .build();
@@ -95,7 +95,7 @@ class ProductMapperTest {
 
     @Test
     void dtoToProduct_NameIsTooLong() {
-        ProductDTO productDTO = ProductDTO.builder()
+        CreateProductDTO productDTO = CreateProductDTO.builder()
                 .name("a".repeat(51))
                 .status("ENABLED")
                 .build();

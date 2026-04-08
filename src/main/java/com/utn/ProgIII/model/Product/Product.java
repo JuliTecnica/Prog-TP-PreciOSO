@@ -36,7 +36,7 @@ public class Product {
     @Enumerated(EnumType.STRING)
     private ProductStatus status;
 
-    private Float profitMargin;
+    private Double profitMargin;
 
     private Integer stock;
 

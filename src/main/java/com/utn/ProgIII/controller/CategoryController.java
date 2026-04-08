@@ -2,7 +2,6 @@ package com.utn.ProgIII.controller;
 
 import com.utn.ProgIII.dto.AddCategoryDTO;
 import com.utn.ProgIII.dto.CategoryDTO;
-import com.utn.ProgIII.dto.ProductDTO;
 import com.utn.ProgIII.service.interfaces.CategoryService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.ArraySchema;

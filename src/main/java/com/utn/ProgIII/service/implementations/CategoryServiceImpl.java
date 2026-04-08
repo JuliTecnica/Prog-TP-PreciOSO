@@ -1,6 +1,7 @@
 package com.utn.ProgIII.service.implementations;
 
 import com.utn.ProgIII.dto.CategoryDTO;
+import com.utn.ProgIII.exceptions.NotFoundException;
 import com.utn.ProgIII.mapper.CategoryMapper;
 import com.utn.ProgIII.model.Product.Category;
 import com.utn.ProgIII.repository.CategoryRepository;
@@ -28,7 +29,12 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     public void removeCategory(Long id) {
-
+        if(categoryRepository.existsById(id))
+        {
+            categoryRepository.deleteById(id);
+        } else {
+            throw new NotFoundException("Esa categoria no existe!");
+        }
     }
 
     @Override

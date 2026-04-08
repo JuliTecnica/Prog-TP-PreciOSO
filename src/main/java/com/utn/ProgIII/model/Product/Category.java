@@ -2,10 +2,7 @@ package com.utn.ProgIII.model.Product;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
+import lombok.*;
 import org.hibernate.envers.NotAudited;
 import org.hibernate.validator.constraints.Length;
 
@@ -16,6 +13,8 @@ import java.util.List;
 @NoArgsConstructor
 @Builder
 @ToString
+@Getter
+@Setter
 public class Category {
 
     @Id

@@ -38,4 +38,8 @@ public class Product {
     private Float profitMargin;
 
     private Integer stock;
+
+    @ManyToOne
+    private Category category;
+
 }

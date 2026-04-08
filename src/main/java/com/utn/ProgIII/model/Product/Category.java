@@ -1,0 +1,34 @@
+package com.utn.ProgIII.model.Product;
+
+import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.NoArgsConstructor;
+import lombok.ToString;
+import org.hibernate.envers.NotAudited;
+import org.hibernate.validator.constraints.Length;
+
+import java.util.List;
+
+@Entity
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
+@ToString
+public class Category {
+
+    @Id
+    @GeneratedValue (strategy = GenerationType.IDENTITY)
+    private Integer idCategory;
+
+    @NotBlank(message = "El nombre de la categoria no puede ser vacio")
+    @Length(min = 3, max = 30, message = "El nombre de la categoria debe tener entre 3 y 30 caracteres")
+    private String name;
+
+
+    @ManyToOne
+    @ToString.Exclude
+    @NotAudited
+    private List<Product> productList;
+}

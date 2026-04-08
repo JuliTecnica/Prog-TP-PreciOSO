@@ -25,9 +25,4 @@ public class Category {
     @Length(min = 3, max = 30, message = "El nombre de la categoria debe tener entre 3 y 30 caracteres")
     private String name;
 
-
-    @ManyToOne
-    @ToString.Exclude
-    @NotAudited
-    private List<Product> productList;
 }

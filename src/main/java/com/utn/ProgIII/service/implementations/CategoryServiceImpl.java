@@ -39,7 +39,16 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     public CategoryDTO modifyCategory(CategoryDTO categoryDTO, Long id) {
+        Category category = categoryRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Esa categoria no existe!"));
 
+
+        category.setName(categoryDTO.name());
+
+        categoryValidations.checkIfCategoryNameExists(category);
+        category = categoryRepository.save(category);
+
+        return categoryMapper.toDTO(category);
     }
 
     @Override

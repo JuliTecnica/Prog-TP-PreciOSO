@@ -15,7 +15,7 @@ public class CategoryController {
     private CategoryService categoryService;
 
     @PostMapping("")
-    public ResponseEntity<CategoryDTO> addCategory(@Valid @RequestBody CategoryDTO categoryDTO) {
+    public ResponseEntity<CategoryDTO> addCategory(@RequestBody CategoryDTO categoryDTO) {
         return ResponseEntity.status(201).body(categoryService.addCategory(categoryDTO));
     }
 
@@ -24,5 +24,10 @@ public class CategoryController {
     {
         categoryService.removeCategory(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<CategoryDTO> updateCategory(@RequestBody CategoryDTO categoryDTO, @PathVariable Long id) {
+        return ResponseEntity.ok(categoryService.modifyCategory(categoryDTO, id));
     }
 }

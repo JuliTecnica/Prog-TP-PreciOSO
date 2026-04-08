@@ -1,5 +1,6 @@
 package com.utn.ProgIII.service.implementations;
 
+import com.utn.ProgIII.dto.AddCategoryDTO;
 import com.utn.ProgIII.dto.CategoryDTO;
 import com.utn.ProgIII.exceptions.NotFoundException;
 import com.utn.ProgIII.mapper.CategoryMapper;
@@ -23,7 +24,7 @@ public class CategoryServiceImpl implements CategoryService {
     private CategoryValidations categoryValidations;
 
     @Override
-    public CategoryDTO addCategory(CategoryDTO categoryDTO) {
+    public CategoryDTO addCategory(AddCategoryDTO categoryDTO) {
         Category category = categoryMapper.toEntity(categoryDTO);
         categoryValidations.checkIfCategoryNameExists(category);
 
@@ -42,7 +43,7 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-    public CategoryDTO modifyCategory(CategoryDTO categoryDTO, Long id) {
+    public CategoryDTO modifyCategory(AddCategoryDTO categoryDTO, Long id) {
         Category category = categoryRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Esa categoria no existe!"));
 

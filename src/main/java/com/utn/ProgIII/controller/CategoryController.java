@@ -2,10 +2,10 @@ package com.utn.ProgIII.controller;
 
 import com.utn.ProgIII.dto.CategoryDTO;
 import com.utn.ProgIII.service.interfaces.CategoryService;
-import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import java.util.List;
 
 @RestController
 @RequestMapping("/categories")
@@ -29,5 +29,10 @@ public class CategoryController {
     @PutMapping("/{id}")
     public ResponseEntity<CategoryDTO> updateCategory(@RequestBody CategoryDTO categoryDTO, @PathVariable Long id) {
         return ResponseEntity.ok(categoryService.modifyCategory(categoryDTO, id));
+    }
+
+    @GetMapping()
+    public ResponseEntity<List<CategoryDTO>> getAllCategories() {
+        return ResponseEntity.ok(categoryService.getAllCategories());
     }
 }

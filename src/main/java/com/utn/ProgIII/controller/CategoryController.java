@@ -81,4 +81,19 @@ public class CategoryController {
     public ResponseEntity<List<CategoryDTO>> getAllCategories() {
         return ResponseEntity.ok(categoryService.getAllCategories());
     }
+
+    @Operation(summary = "Muestra una sola categoria")
+    @ApiResponse(responseCode = "200", description = "Categoria encontrada", content = @Content(
+            mediaType = "application/json",
+            schema = @Schema(implementation = CategoryDTO.class)
+    ))
+    @ApiResponse(responseCode = "404", description = "Categoria no encontrada", content = @Content(
+            mediaType = "application/json",
+            schema = @Schema(implementation = ProblemDetail.class)
+    ))
+    @GetMapping("/{id}")
+    public ResponseEntity<CategoryDTO> getCategoryById(@PathVariable Long id)
+    {
+        return ResponseEntity.ok(categoryService.getOneCategoryById(id));
+    }
 }

@@ -1,9 +1,13 @@
 package com.utn.ProgIII.service.implementations;
 
+import com.querydsl.core.BooleanBuilder;
+import com.querydsl.jpa.JPQLTemplates;
+import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.utn.ProgIII.dto.*;
 import com.utn.ProgIII.exceptions.*;
 import com.utn.ProgIII.mapper.UserMapper;
 import com.utn.ProgIII.model.Credential.Role;
+import com.utn.ProgIII.model.User.QUser;
 import com.utn.ProgIII.model.User.User;
 import com.utn.ProgIII.model.User.UserStatus;
 import com.utn.ProgIII.repository.UserRepository;
@@ -11,8 +15,12 @@ import com.utn.ProgIII.validations.CredentialValidations;
 import com.utn.ProgIII.validations.UserValidations;
 import com.utn.ProgIII.service.interfaces.UserService;
 import jakarta.annotation.PostConstruct;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.EntityManagerFactory;
+import jakarta.persistence.Persistence;
 import jakarta.transaction.Transactional;
 import org.apache.commons.lang3.EnumUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -31,7 +39,6 @@ public class UserServiceImpl implements UserService {
     private final UserMapper userMapper;
     private final UserValidations userValidations;
     private final CredentialValidations credentialValidations;
-
     /**
      * Se crea un administrador en caso de que no exista
      */
@@ -255,4 +262,35 @@ public class UserServiceImpl implements UserService {
             userRepository.delete(user);
     }
 
+
+    @Override
+    public Page<UserWithCredentialDTO> getUsersUsingDsl(Pageable pageable, String status, String role)
+    {
+        QUser user = QUser.user;
+        BooleanBuilder builder = new BooleanBuilder().or(user.isNotNull());
+
+        if(role != null && !EnumUtils.isValidEnum(Role.class, role.toUpperCase())) {
+            throw new InvalidRequestException("Ese rol no está presente");
+        }
+
+        if(status != null && !EnumUtils.isValidEnum(UserStatus.class, status.toUpperCase()))
+        {
+            throw new InvalidRequestException("Ese estado no está presente");
+        }
+
+        // Add status filter if provided
+        if (status != null) {
+            UserStatus enum_status = UserStatus.valueOf(status);
+            builder.and(user.status.eq(enum_status));
+        }
+
+        // Add role filter if provided
+        if (role != null) {
+            Role enum_role = Role.valueOf(role);
+            builder.and(user.credential.role.eq(enum_role));
+        }
+
+        System.out.println(builder);
+        return userRepository.findAll(builder, pageable).map(userMapper::toUserWithCredentialDTO);
+    }
 }

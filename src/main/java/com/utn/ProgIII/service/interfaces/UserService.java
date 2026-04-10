@@ -21,4 +21,5 @@ public interface UserService {
     void deleteOrRemoveUser(Long id, String method);
     Page<UserWithCredentialDTO> getUsersPage(Pageable pageable);
 
+    Page<UserWithCredentialDTO> getUsersUsingDsl(Pageable pageable, String status, String role);
 }

@@ -218,4 +218,13 @@ public class UserController {
         userService.deleteOrRemoveUser(id, deletionType);
         return ResponseEntity.noContent().build();
     }
+
+
+    @GetMapping("/dsl-test")
+    public ResponseEntity<Page<UserWithCredentialDTO>> getAllUsersUsingDsl(@RequestParam(required = false) String role,
+                                                                           @RequestParam(required = false) String status,
+                                                                           @ParameterObject @PageableDefault(size = 10) Pageable paginacion)
+    {
+        return ResponseEntity.ok(userService.getUsersUsingDsl(paginacion,status,role));
+    }
 }

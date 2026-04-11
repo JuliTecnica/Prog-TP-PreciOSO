@@ -1,5 +1,6 @@
 package com.utn.ProgIII.controller;
 
+import com.utn.ProgIII.dto.CreateProductDTO;
 import com.utn.ProgIII.dto.ProductDTO;
 import com.utn.ProgIII.service.interfaces.ProductService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -50,7 +51,7 @@ public class ProductController {
     ))
     public ResponseEntity<ProductDTO> addProduct (
             @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "El producto para crear")
-            @RequestBody ProductDTO productDTO
+            @RequestBody CreateProductDTO productDTO
     ){
 
         ProductDTO response = productService.createProductDto(productDTO);
@@ -89,12 +90,18 @@ public class ProductController {
             mediaType = "application/json",
             array = @ArraySchema(schema = @Schema(implementation = ProductDTO.class))
     ))
+    /*
     @ApiResponse(responseCode = "404", description = "Productos no encontrados", content = @Content(
             mediaType = "application/json",
             schema = @Schema(implementation = ProblemDetail.class)
-    ))
-    public ResponseEntity<Page<ProductDTO>> getAllProduct (@ParameterObject @PageableDefault(size = 10) Pageable paginacion){
-        Page<ProductDTO> response = productService.getAllProduct(paginacion);
+    ))*/
+    public ResponseEntity<Page<ProductDTO>> getAllProduct (
+            @ParameterObject @PageableDefault(size = 5) Pageable paginacion,
+            @RequestParam(required = false) String name,
+            @RequestParam(required = false) String status,
+            @RequestParam(required = false) List<Long> category
+    ){
+        Page<ProductDTO> response = productService.getProductsPage(paginacion, name, status, category);
 
         return ResponseEntity.ok(response);
     }
@@ -103,7 +110,7 @@ public class ProductController {
     @Operation(summary = "Devuelve todos los productos en una lista", description = "Devuelve una lista de todos los productos")
     @ApiResponse(responseCode = "200", description = "Lista devuelta correctamente", content = @Content(
             mediaType = "application/json",
-            array = @ArraySchema(schema = @Schema(implementation = List.class)
+            array = @ArraySchema(schema = @Schema(implementation = ProductDTO.class)
     )))
     @ApiResponse(responseCode = "404", description = "Productos no encontrados", content = @Content(
             mediaType = "application/json",
@@ -113,75 +120,11 @@ public class ProductController {
         return ResponseEntity.ok(productService.getAllProductsAsList());
     }
 
-
-    //muestra la lista de todos los productos por estado
-    @GetMapping("/search/status/{status}")
-    @ApiResponse(responseCode = "200", description = "Lista de productos según estado devuelta correctamente", content = @Content(
-            mediaType = "application/json",
-            array = @ArraySchema(schema = @Schema(implementation = ProductDTO.class))
-    ))
-    @ApiResponse(responseCode = "400", description = "Error de datos introducidos por el usuario", content = @Content(
-            mediaType = "application/json",
-            schema = @Schema(implementation = ProblemDetail.class)
-    ))
-    @ApiResponse(responseCode = "404", description = "Productos no encontrados", content = @Content(
-            mediaType = "application/json",
-            schema = @Schema(implementation = ProblemDetail.class)
-    ))
-    @Operation(summary = "Se muestra una lista de productos por su estado", description = "Se muestra una lista según su estado")
-    public ResponseEntity<Page<ProductDTO>> getAllProductByStatus(@PathVariable @Parameter(description = "El estado de un producto (ENABLED, DISABLED)", example = "ENABLED") String status,@ParameterObject @PageableDefault(size = 10) Pageable paginacion){
-
-        Page<ProductDTO> response = productService.getAllProductByStatus(status,paginacion);
-
-        return ResponseEntity.ok(response);
-    }
-
-    //muestra lista de productos (busca por nombre)
-    @GetMapping("/search/name/{name}")
-    @Operation(summary = "Se muestra una lista de productos por nombres", description = "Se muestra una lista de productos por nombres")
-    @ApiResponse(responseCode = "200", description = "Lista de productos según nombre")
-    @ApiResponse(responseCode = "404",description = "Productos no encontrados", content = @Content(
-            mediaType = "application/json",
-            schema = @Schema(implementation = ProblemDetail.class)
-    ))
-    public ResponseEntity<Page<ProductDTO>> getProductByName(@PathVariable @Parameter(description = "El nombre de un producto", example = "Manzana") String name,@ParameterObject @PageableDefault(size = 10) Pageable paginacion){
-
-        return ResponseEntity.ok(productService.getProductByName(name,paginacion));
-    }
-
     @GetMapping("/active-list")
     public ResponseEntity<List<ProductDTO>> getActiveProductsInList()
     {
         return ResponseEntity.ok(productService.getAllActiveProductAsList());
     }
-
-    /*
-    @ApiResponse(
-            responseCode = "200",
-            description = "Encontrado",
-            content = {
-                    @Content(
-                            mediaType = "application/json",
-                            array = @ArraySchema(schema = @Schema(implementation = ProductDTO.class)))
-            })
-    @ApiResponse(responseCode = "400", description = "Datos erróneos", content = @Content(
-            mediaType = "text/plain;charset=UTF-8",
-            schema = @Schema(example = "No property 'nam' found for type 'Product'; Did you mean 'name'")
-    ))
-    @ApiResponse(responseCode = "404", description = "No encontrado", content = {
-            @Content(
-                    mediaType = "text/plain;charset=UTF-8",
-                    schema = @Schema(example = "No hay usuarios")
-            )
-    })
-    @Operation(summary = "Busca una página de productos", description = "Lista una página de productos")
-    @GetMapping("/page")
-    public ResponseEntity<Page<ProductDTO>> getProducts(
-            @ParameterObject @PageableDefault(size = 10) Pageable paginacion
-    )
-    {
-        return ResponseEntity.ok(productService.getProductPage(paginacion));
-    }*/
 
     //modificar un producto
     @PutMapping("/{id}")
@@ -196,7 +139,7 @@ public class ProductController {
             schema = @Schema(implementation = ProblemDetail.class)
     ))
 
-    public ProductDTO update (@PathVariable @Parameter(description = "El ID de un producto", example = "1") Long id, @RequestBody ProductDTO modifyProductDTO){
+    public ProductDTO update (@PathVariable @Parameter(description = "El ID de un producto", example = "1") Long id, @RequestBody CreateProductDTO modifyProductDTO){
 
        return productService.updateProduct(id,modifyProductDTO);
     }

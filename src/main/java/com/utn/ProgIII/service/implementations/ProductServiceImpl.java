@@ -1,15 +1,16 @@
 package com.utn.ProgIII.service.implementations;
 
-import com.utn.ProgIII.dto.ProductDTO;
+import com.querydsl.core.BooleanBuilder;
+import com.utn.ProgIII.dto.CreateProductDTO;
 
-import com.utn.ProgIII.dto.UserWithCredentialDTO;
-import com.utn.ProgIII.exceptions.InvalidProductStatusException;
-import com.utn.ProgIII.exceptions.InvalidRequestException;
-import com.utn.ProgIII.exceptions.ProductNotFoundException;
-import com.utn.ProgIII.exceptions.UserNotFoundException;
+import com.utn.ProgIII.dto.ProductDTO;
+import com.utn.ProgIII.exceptions.*;
 import com.utn.ProgIII.mapper.ProductMapper;
+import com.utn.ProgIII.model.Product.Category;
 import com.utn.ProgIII.model.Product.Product;
 import com.utn.ProgIII.model.Product.ProductStatus;
+import com.utn.ProgIII.model.Product.QProduct;
+import com.utn.ProgIII.repository.CategoryRepository;
 import com.utn.ProgIII.repository.ProductRepository;
 import com.utn.ProgIII.repository.ProductSupplierRepository;
 import com.utn.ProgIII.service.interfaces.AuthService;
@@ -18,11 +19,9 @@ import jakarta.transaction.Transactional;
 import com.utn.ProgIII.validations.ProductValidations;
 import org.apache.commons.lang3.EnumUtils;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 
 
@@ -32,14 +31,16 @@ public class ProductServiceImpl implements ProductService {
     private final ProductRepository productRepository;
     private final ProductMapper productMapper;
     private final ProductSupplierRepository productSupplierRepository;
+    private final CategoryRepository categoryRepository;
     private final ProductValidations productValidations;
     private final AuthService authService;
 
-    public ProductServiceImpl(ProductRepository productRepository, ProductMapper productMapper, ProductSupplierRepository productSupplierRepository, ProductValidations productValidations, AuthService authService) {
+    public ProductServiceImpl(ProductRepository productRepository, ProductMapper productMapper, ProductSupplierRepository productSupplierRepository, CategoryRepository categoryRepository,ProductValidations productValidations, AuthService authService) {
 
         this.productRepository = productRepository;
         this.productMapper = productMapper;
         this.productSupplierRepository = productSupplierRepository;
+        this.categoryRepository = categoryRepository;
         this.productValidations = productValidations;
         this.authService = authService;
     }
@@ -47,6 +48,7 @@ public class ProductServiceImpl implements ProductService {
 
     /**
      * Busca un producto por su ID
+     *
      * @param id ID del producto
      * @return <code>ProductDTO</code>
      */
@@ -66,33 +68,6 @@ public class ProductServiceImpl implements ProductService {
         return productMapper.toProductDTO(product);
     }
 
-    /**
-     * Una página que contiene los datos de productos.
-     * <p>Se puede definir el tamaño con ?size=?</p>
-     * <p>Se puede definir el número de página con ?page=?</p>
-     * <p>Se puede ordenar según parámetro de objeto con ?sort=?</p>
-     * @param paginacion Una página con contenido e información
-     * @return Una página con contenido e información
-     */
-    @Override
-    public Page<ProductDTO> getAllProduct(Pageable paginacion) {
-
-        Page<ProductDTO> page = null;
-
-        if(authService.isEmployee())
-        {
-            page = productRepository.findByStatus(ProductStatus.ENABLED,paginacion).map(productMapper::toProductDTO);
-        } else {
-            page = productRepository.findAll(paginacion).map(productMapper::toProductDTO);
-        }
-
-        if(page.getNumberOfElements() == 0)
-        {
-            throw new ProductNotFoundException("No hay productos");
-        }
-
-        return page;
-    }
 
     @Override
     public List<ProductDTO> getAllActiveProductAsList() {
@@ -117,73 +92,21 @@ public class ProductServiceImpl implements ProductService {
         return list;
     }
 
-
-    /**
-     * Busca productos según estado
-     * @param status El estado del producto
-     * @return Lista <code>ProductDto</code>
-     * @see ProductStatus
-     * @see ProductDTO
-     *
-     */
-    @Override
-    public Page<ProductDTO> getAllProductByStatus(String status,Pageable paginacion) {
-
-        try {
-            ProductStatus value = ProductStatus.valueOf(status.toUpperCase());
-
-            Page<ProductDTO> products = productRepository.findByStatus(value,paginacion).map(productMapper::toProductDTO);
-
-            if(products.isEmpty())
-            {
-                throw new ProductNotFoundException("No hay resultados");
-            }
-
-            return products;
-        } catch (IllegalArgumentException e){
-            throw new InvalidProductStatusException("El estado ingresado es inválido");
-        }
-    }
-
-    /**
-     * Busca un producto según nombre
-     * @param name El nombre del producto, se usa un LIKE de sql
-     * @return Retorna una lista de <code>ProductDto</code>
-     * @see ProductDTO
-     */
-
-    @Override
-    public Page<ProductDTO> getProductByName(String name,Pageable pageable) {
-
-        List<Product> products = productRepository.findByNameContaining(name,pageable);
-
-
-        if(authService.isEmployee())
-        {
-            products = products.stream().filter((x) -> x.getStatus() == ProductStatus.ENABLED).toList();
-        }
-
-        if(products.isEmpty())
-        {
-            throw new ProductNotFoundException("No hay resultados");
-        }
-
-
-
-        return new PageImpl<ProductDTO>(products.stream().map(productMapper::toProductDTO).toList());
-    }
-
     /**
      * Crea un producto nuevo y lo guarda en la base de datos
+     *
      * @param productDto Un DTO de un producto que se creará
      * @return Un <code>ProductDto</code> del producto creado
-     * @see ProductDTO
+     * @see CreateProductDTO
      */
 
     @Override
-    public ProductDTO createProductDto(ProductDTO productDto) {
+    public ProductDTO createProductDto(CreateProductDTO productDto) {
 
         Product product = productMapper.toEntity(productDto);
+        Category category = categoryRepository.findById(productDto.idCategory()).orElseThrow(() -> new NotFoundException("Esa categoria no existe!"));
+        product.setCategory(category);
+
         productValidations.validateProductNameExists(product);
         product = productRepository.save(product);
 
@@ -192,14 +115,15 @@ public class ProductServiceImpl implements ProductService {
 
     /**
      * Se actualiza un producto según su ID
-     * @param id ID del producto que se modificará
+     *
+     * @param id         ID del producto que se modificará
      * @param productDto Los datos para modificar el producto
      * @return Un ProductDTO del producto modificado
-     * @see ProductDTO
+     * @see CreateProductDTO
      */
     @Override
     @Transactional
-    public ProductDTO updateProduct(Long id, ProductDTO productDto) {
+    public ProductDTO updateProduct(Long id, CreateProductDTO productDto) {
 
         if(!EnumUtils.isValidEnum(ProductStatus.class,productDto.status()))
         {
@@ -208,8 +132,10 @@ public class ProductServiceImpl implements ProductService {
 
         Product product = productRepository.findById(id)
                 .orElseThrow(() -> new ProductNotFoundException("Producto no encontrado"));
+        Category category = categoryRepository.findById(productDto.idCategory()).orElseThrow(() -> new NotFoundException("Esa categoria no existe!"));
 
         product.setName(productDto.name());
+        product.setCategory(category);
         product.setStatus(ProductStatus.valueOf(productDto.status().toUpperCase()));
 
         if(product.getStatus() == ProductStatus.DISABLED)
@@ -222,6 +148,48 @@ public class ProductServiceImpl implements ProductService {
 
         product = productRepository.save(product);
         return productMapper.toProductDTO(product);
+    }
+
+    /**
+     *
+     * @param pageable Objecto de paginación
+     * @param name Nombre del producto buscado
+     * @param status Estado del producto buscado
+     * @param categories Listado de categorias de productos (puede ser buscado individualmente)
+     * @return Pagina de DTOs de productos
+     */
+    @Override
+    public Page<ProductDTO> getProductsPage(Pageable pageable, String name, String status, List<Long> categories) {
+        QProduct product = QProduct.product;
+        BooleanBuilder builder = new BooleanBuilder().or(product.isNotNull());
+
+        if(name != null && !name.isBlank())
+        {
+            builder.and(product.name.likeIgnoreCase('%' + name + '%'));
+        }
+
+
+        if(status != null && !EnumUtils.isValidEnum(ProductStatus.class, status.toUpperCase())) {
+            throw new InvalidRequestException("Ese estado no está presente");
+        }
+
+        if (status != null && !authService.isEmployee())
+        {
+            ProductStatus productStatus = ProductStatus.valueOf(status);
+            builder.and(product.status.eq(productStatus));
+        }
+
+        if (authService.isEmployee())
+        {
+            builder.and(product.status.eq(ProductStatus.ENABLED));
+        }
+
+        if (categories != null && !categories.isEmpty())
+        {
+            builder.and(product.category.idCategory.in(categories));
+        }
+
+        return productRepository.findAll(builder,pageable).map(productMapper::toProductDTO);
     }
 
     /**

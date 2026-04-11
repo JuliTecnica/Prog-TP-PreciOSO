@@ -1,10 +1,13 @@
 package com.utn.ProgIII.mapper;
 
+import com.utn.ProgIII.dto.CategoryDTO;
+import com.utn.ProgIII.dto.CreateProductDTO;
 import com.utn.ProgIII.dto.ProductDTO;
 import com.utn.ProgIII.exceptions.InvalidRequestException;
 import com.utn.ProgIII.model.Product.Product;
 import com.utn.ProgIII.model.Product.ProductStatus;
 import org.apache.commons.lang3.EnumUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -13,6 +16,8 @@ import org.springframework.stereotype.Component;
  */
 public class ProductMapper {
 
+    @Autowired
+    private CategoryMapper categoryMapper;
 
     /**
      * Se encarga de convertir un objeto a un dto
@@ -23,10 +28,11 @@ public class ProductMapper {
         Long idProduct = product.getIdProduct();
         String name = product.getName();
         String status = product.getStatus().toString();
-        Float profitMargin = product.getProfitMargin();
+        Double profitMargin = product.getProfitMargin();
         Integer stock = product.getStock();
+        CategoryDTO category = categoryMapper.toDTO(product.getCategory());
 
-        return new ProductDTO(idProduct,name,status, profitMargin, stock);
+        return new ProductDTO(idProduct,name,status, profitMargin, stock, category);
     }
 
     /**
@@ -34,7 +40,7 @@ public class ProductMapper {
      * @param productDTO Un dto
      * @return Un objeto nuevo
      */
-    public Product toEntity (ProductDTO productDTO){
+    public Product toEntity (CreateProductDTO productDTO){
         Product result = new Product();
 
         result.setName(productDTO.name());

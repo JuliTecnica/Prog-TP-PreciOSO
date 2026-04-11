@@ -9,12 +9,10 @@ import java.util.List;
 
 public interface SupplierService {
     ViewSupplierDTO viewOneSupplier(long id);
-    Page<ViewSupplierDTO> viewPageSuppliersByName(String name,Pageable pageable);
     void deleteSupplier(long id);
     ViewSupplierDTO updateSupplier(AddSupplierDTO supplierDTO, Long id);
     ViewSupplierDTO createSupplier(AddSupplierDTO supplierDTO);
-    Page<ViewSupplierDTO> listSuppliers(Pageable pageable);
     List<ViewSupplierDTO> listAllSuppliers();
-
+    Page<ViewSupplierDTO> listSuppliersPage(Pageable pageable, String name);
 
 }

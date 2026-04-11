@@ -2,10 +2,11 @@ package com.utn.ProgIII.dto;
 
 import com.utn.ProgIII.model.Product.ProductStatus;
 import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.Builder;
 
-public record ProductDTO(
-        @Schema(example = "1")
-        Long idProduct,
+@Builder
+
+public record CreateProductDTO(
         @Schema(example = "Pasas de uva")
         String name,
         @Schema(implementation = ProductStatus.class)
@@ -15,5 +16,6 @@ public record ProductDTO(
         @Schema(example = "1.5")
         Integer stock,
         @Schema(example = "1")
-        CategoryDTO category) {
+        Long idCategory
+) {
 }

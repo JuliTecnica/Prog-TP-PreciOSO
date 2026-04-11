@@ -6,6 +6,7 @@ import jakarta.validation.constraints.*;
 import lombok.*;
 import org.hibernate.envers.Audited;
 import org.hibernate.envers.NotAudited;
+import org.hibernate.envers.RelationTargetAuditMode;
 
 import java.util.List;
 
@@ -35,7 +36,13 @@ public class Product {
     @Enumerated(EnumType.STRING)
     private ProductStatus status;
 
-    private Float profitMargin;
+    private Double profitMargin;
 
     private Integer stock;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @NotAudited
+    @JoinColumn(name = "category_id")
+    private Category category;
+
 }

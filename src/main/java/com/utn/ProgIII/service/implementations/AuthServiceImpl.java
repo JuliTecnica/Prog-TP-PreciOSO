@@ -52,7 +52,7 @@ public class AuthServiceImpl implements AuthService {
      */
     public boolean isEmployee() {
 
-        return hasRole("ROLE_EMPLOYEE") && (getRoleCount() == 1);
+        return hasRole("ROLE_EMPLOYEE") && (getRoleCount() == 2);
     }
 
     /**

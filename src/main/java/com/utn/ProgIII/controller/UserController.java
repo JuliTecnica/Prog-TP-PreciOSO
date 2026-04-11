@@ -2,7 +2,6 @@ package com.utn.ProgIII.controller;
 
 import com.utn.ProgIII.dto.CreateUserDTO;
 import com.utn.ProgIII.dto.CreateUserNoAuthDTO;import com.utn.ProgIII.dto.UserWithCredentialDTO;
-import com.utn.ProgIII.dto.ViewSupplierDTO;
 import com.utn.ProgIII.service.interfaces.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -20,8 +19,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 /**
  * Clase que se encarga del procesamiento de las solicitudes recibidas desde el front
@@ -190,6 +187,6 @@ public class UserController {
                                                                            @RequestParam(required = false) String status,
                                                                            @ParameterObject @PageableDefault(size = 10) Pageable paginacion)
     {
-        return ResponseEntity.ok(userService.getUsersUsingDsl(paginacion,status,role));
+        return ResponseEntity.ok(userService.getUsersPage(paginacion,status,role));
     }
 }

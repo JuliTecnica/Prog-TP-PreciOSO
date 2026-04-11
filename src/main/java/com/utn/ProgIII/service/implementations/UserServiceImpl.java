@@ -1,8 +1,6 @@
 package com.utn.ProgIII.service.implementations;
 
 import com.querydsl.core.BooleanBuilder;
-import com.querydsl.jpa.JPQLTemplates;
-import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.utn.ProgIII.dto.*;
 import com.utn.ProgIII.exceptions.*;
 import com.utn.ProgIII.mapper.UserMapper;
@@ -15,19 +13,12 @@ import com.utn.ProgIII.validations.CredentialValidations;
 import com.utn.ProgIII.validations.UserValidations;
 import com.utn.ProgIII.service.interfaces.UserService;
 import jakarta.annotation.PostConstruct;
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.EntityManagerFactory;
-import jakarta.persistence.Persistence;
 import jakarta.transaction.Transactional;
 import org.apache.commons.lang3.EnumUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 /**
  * Clase que se encarga de la lógica entre el repositorio y el mapper
@@ -220,7 +211,7 @@ public class UserServiceImpl implements UserService {
      * <p>
      */
     @Override
-    public Page<UserWithCredentialDTO> getUsersUsingDsl(Pageable pageable, String status, String role)
+    public Page<UserWithCredentialDTO> getUsersPage(Pageable pageable, String status, String role)
     {
         QUser user = QUser.user;
         BooleanBuilder builder = new BooleanBuilder().or(user.isNotNull());

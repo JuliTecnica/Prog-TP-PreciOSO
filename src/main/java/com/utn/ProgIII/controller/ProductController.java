@@ -90,12 +90,18 @@ public class ProductController {
             mediaType = "application/json",
             array = @ArraySchema(schema = @Schema(implementation = ProductDTO.class))
     ))
+    /*
     @ApiResponse(responseCode = "404", description = "Productos no encontrados", content = @Content(
             mediaType = "application/json",
             schema = @Schema(implementation = ProblemDetail.class)
-    ))
-    public ResponseEntity<Page<ProductDTO>> getAllProduct (@ParameterObject @PageableDefault(size = 10) Pageable paginacion){
-        Page<ProductDTO> response = productService.getAllProduct(paginacion);
+    ))*/
+    public ResponseEntity<Page<ProductDTO>> getAllProduct (
+            @ParameterObject @PageableDefault(size = 5) Pageable paginacion,
+            @RequestParam(required = false) String name,
+            @RequestParam(required = false) String status,
+            @RequestParam(required = false) List<Long> category
+    ){
+        Page<ProductDTO> response = productService.getProductsPage(paginacion, name, status, category);
 
         return ResponseEntity.ok(response);
     }
@@ -112,42 +118,6 @@ public class ProductController {
     ))
     public ResponseEntity<List<ProductDTO>> getAllProductsAsList(){
         return ResponseEntity.ok(productService.getAllProductsAsList());
-    }
-
-
-    //muestra la lista de todos los productos por estado
-    @GetMapping("/search/status/{status}")
-    @ApiResponse(responseCode = "200", description = "Lista de productos según estado devuelta correctamente", content = @Content(
-            mediaType = "application/json",
-            array = @ArraySchema(schema = @Schema(implementation = ProductDTO.class))
-    ))
-    @ApiResponse(responseCode = "400", description = "Error de datos introducidos por el usuario", content = @Content(
-            mediaType = "application/json",
-            schema = @Schema(implementation = ProblemDetail.class)
-    ))
-    @ApiResponse(responseCode = "404", description = "Productos no encontrados", content = @Content(
-            mediaType = "application/json",
-            schema = @Schema(implementation = ProblemDetail.class)
-    ))
-    @Operation(summary = "Se muestra una lista de productos por su estado", description = "Se muestra una lista según su estado")
-    public ResponseEntity<Page<ProductDTO>> getAllProductByStatus(@PathVariable @Parameter(description = "El estado de un producto (ENABLED, DISABLED)", example = "ENABLED") String status, @ParameterObject @PageableDefault(size = 10) Pageable paginacion){
-
-        Page<ProductDTO> response = productService.getAllProductByStatus(status,paginacion);
-
-        return ResponseEntity.ok(response);
-    }
-
-    //muestra lista de productos (busca por nombre)
-    @GetMapping("/search/name/{name}")
-    @Operation(summary = "Se muestra una lista de productos por nombres", description = "Se muestra una lista de productos por nombres")
-    @ApiResponse(responseCode = "200", description = "Lista de productos según nombre")
-    @ApiResponse(responseCode = "404",description = "Productos no encontrados", content = @Content(
-            mediaType = "application/json",
-            schema = @Schema(implementation = ProblemDetail.class)
-    ))
-    public ResponseEntity<Page<ProductDTO>> getProductByName(@PathVariable @Parameter(description = "El nombre de un producto", example = "Manzana") String name, @ParameterObject @PageableDefault(size = 10) Pageable paginacion){
-
-        return ResponseEntity.ok(productService.getProductByName(name,paginacion));
     }
 
     @GetMapping("/active-list")

@@ -16,10 +16,8 @@ public interface UserService {
     UserWithCredentialDTO createUserNoAuth(CreateUserNoAuthDTO dto);
     UserWithCredentialDTO createUserWithCredential(CreateUserDTO dto);
     UserWithCredentialDTO getUserById(Long id);
-    Page<UserWithCredentialDTO> filterUsers(String role, String status,Pageable pageable);
     UserWithCredentialDTO updateUser(Long id, CreateUserDTO dto);
     void deleteOrRemoveUser(Long id, String method);
-    Page<UserWithCredentialDTO> getUsersPage(Pageable pageable);
 
     Page<UserWithCredentialDTO> getUsersUsingDsl(Pageable pageable, String status, String role);
 }

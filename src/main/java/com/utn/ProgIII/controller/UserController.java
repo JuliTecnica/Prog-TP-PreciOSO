@@ -58,62 +58,6 @@ public class UserController {
     }
 
     /**
-     * Una página que contiene los datos de usuarios.
-     * <p>Se puede definir el tamaño con ?size=?</p>
-     * <p>Se puede definir el número de página con ?page=?</p>
-     * <p>Se puede ordenar según parámetro de objeto con ?sort=?</p>
-     * @param paginacion Una página con su contenido e información
-     * @return Una página con contenido e información
-     */
-    @ApiResponse(
-            responseCode = "200",
-            description = "Encontrado",
-            content = {
-                    @Content(
-                            mediaType = "application/json",
-                            array = @ArraySchema(schema = @Schema(implementation = UserWithCredentialDTO.class)))
-            })
-    @ApiResponse(responseCode = "400", description = "Datos erróneos", content = @Content(
-            mediaType = "text/plain;charset=UTF-8",
-            schema = @Schema(example = "No property 'firstNam' found for type 'User'; Did you mean 'firstname'")
-    ))
-    @ApiResponse(responseCode = "403", description = "Acceso prohibido/dirección no encontrada", content = @Content())
-    @ApiResponse(responseCode = "404", description = "No encontrado", content = {
-            @Content(
-                    mediaType = "application/json",
-                    schema = @Schema(implementation = ProblemDetail.class)
-            )
-    })
-    @Operation(summary = "Busca una página de usuarios", description = "Lista una página de usuarios")
-    @GetMapping("/page")
-    public ResponseEntity<Page<UserWithCredentialDTO>> getUsers(
-            @ParameterObject @PageableDefault(size = 10) Pageable paginacion
-    )
-    {
-        return ResponseEntity.ok(userService.getUsersPage(paginacion));
-    }
-
-    /**
-     * Muestra todos los usuarios que cumplan con los criterios solicitados o todos si no se proporciona ninguno
-     * @return Una respuesta en formato json con los datos de los usuarios que cumplen los criterios solicitados
-     */
-    @Operation(summary = "Obtener una lista de todos los usuarios que tengan un rol o estado solicitado",
-            description = "Retorna una lista de todos los usuarios que cumplan los criterios solicitados," +
-                    "si no se solicita ninguno, se retornan todos los usuarios existentes")
-    @ApiResponse(responseCode = "200",description = "Usuarios encontrados",content = @Content(
-            mediaType = "application/json",
-            array = @ArraySchema(schema = @Schema(implementation = UserWithCredentialDTO.class))
-    ))
-    @ApiResponse(responseCode = "403", description = "Acceso prohibido/dirección no encontrada", content = @Content())
-    @GetMapping()
-    public ResponseEntity<Page<UserWithCredentialDTO>> getOrFilterUsers(@RequestParam(required = false) String role,
-                                                                        @RequestParam(required = false) String status,
-                                                                        @ParameterObject @PageableDefault(size = 10) Pageable paginacion) {
-        return ResponseEntity.ok(userService.filterUsers(role,status,paginacion));
-    }
-
-
-    /**
      * Se crea un nuevo usuario y credenciales en el sistema a partir de la información recibida en el cuerpo de la request
      * @param dto El objeto de transferencia recibido desde la request
      * @return Un DTO para mostrar los datos cargados y su id correspondiente, como una respuesta
@@ -220,7 +164,28 @@ public class UserController {
     }
 
 
-    @GetMapping("/dsl-test")
+    /**
+     * Una página que contiene los datos de usuarios.
+     * <p>Se puede definir el tamaño con ?size=?</p>
+     * <p>Se puede definir el número de página con ?page=?</p>
+     * <p>Se puede ordenar según parámetro de objeto con ?sort=?</p>
+     * @param paginacion Una página con su contenido e información
+     * @return Una página con contenido e información
+     */
+    @ApiResponse(
+            responseCode = "200",
+            description = "Encontrado",
+            content = {
+                    @Content(
+                            mediaType = "application/json",
+                            array = @ArraySchema(schema = @Schema(implementation = UserWithCredentialDTO.class)))
+            })
+    @ApiResponse(responseCode = "400", description = "Datos erróneos", content = @Content(
+            mediaType = "text/plain;charset=UTF-8",
+            schema = @Schema(example = "No property 'firstNam' found for type 'User'; Did you mean 'firstname'")
+    ))
+    @ApiResponse(responseCode = "403", description = "Acceso prohibido/dirección no encontrada", content = @Content())
+    @GetMapping("/page")
     public ResponseEntity<Page<UserWithCredentialDTO>> getAllUsersUsingDsl(@RequestParam(required = false) String role,
                                                                            @RequestParam(required = false) String status,
                                                                            @ParameterObject @PageableDefault(size = 10) Pageable paginacion)

@@ -1,6 +1,6 @@
 package com.utn.ProgIII.serviceTest;
 
-import com.utn.ProgIII.dto.ProductDTO;
+import com.utn.ProgIII.dto.CreateProductDTO;
 import com.utn.ProgIII.exceptions.DuplicateEntityException;
 import com.utn.ProgIII.exceptions.InvalidProductStatusException;
 import com.utn.ProgIII.exceptions.InvalidRequestException;
@@ -57,7 +57,7 @@ public class ProductServiceTest {
     private static final Long NON_EXISTING_ID = 2L;
 
     private Product product;
-    private ProductDTO productDTO;
+    private CreateProductDTO productDTO;
 
     @BeforeEach
     void setUp(){
@@ -83,12 +83,12 @@ public class ProductServiceTest {
         return product;
     }
 
-    private ProductDTO createBasicProductDto(){
-        return new ProductDTO(PRODUCT_ID, PRODUCT_NAME, STATUS_ENABLED.toString());
+    private CreateProductDTO createBasicProductDto(){
+        return new CreateProductDTO(PRODUCT_ID, PRODUCT_NAME, STATUS_ENABLED.toString(),20.0,2, 2L);
     }
 
-    private ProductDTO createBasicDisabledProductDto(){
-        return new ProductDTO(PRODUCT2_ID, PRODUCT2_NAME, STATUS_DISABLED.toString());
+    private CreateProductDTO createBasicDisabledProductDto(){
+        return new CreateProductDTO(PRODUCT2_ID, PRODUCT2_NAME, STATUS_DISABLED.toString(), 20.0, 2, 2L);
     }
 
     @Test
@@ -97,7 +97,7 @@ public class ProductServiceTest {
         when(productRepository.findById(PRODUCT_ID)).thenReturn(Optional.of(product));
         when(productMapper.toProductDTO(product)).thenReturn(productDTO);
 
-        ProductDTO result = productService.getProductById(PRODUCT_ID);
+        CreateProductDTO result = productService.getProductById(PRODUCT_ID);
 
         Assertions.assertNotNull(result);
         Assertions.assertEquals(result.idProduct(), PRODUCT_ID);
@@ -145,7 +145,7 @@ public class ProductServiceTest {
         when(authService.isEmployee()).thenReturn(true);
         when(productMapper.toProductDTO(product)).thenReturn(productDTO);
 
-        ProductDTO result = productService.getProductById(PRODUCT_ID);
+        CreateProductDTO result = productService.getProductById(PRODUCT_ID);
 
         assertEquals(productDTO, result);
         verify(productMapper).toProductDTO(product);
@@ -155,7 +155,7 @@ public class ProductServiceTest {
     @Test
     void getAllProducts_shouldReturnListOfAllProducts_whenUserManager(){
         Product disabledProduct = createDisabledProduct();
-        ProductDTO disableProductDto = createBasicDisabledProductDto();
+        CreateProductDTO disableProductDto = createBasicDisabledProductDto();
 
         List<Product> productList = new ArrayList<>();
         productList.add(product);
@@ -168,7 +168,7 @@ public class ProductServiceTest {
         when(productMapper.toProductDTO(product)).thenReturn(productDTO);
         when(productMapper.toProductDTO(disabledProduct)).thenReturn(disableProductDto);
 
-        List<ProductDTO> result = productService.getAllProduct();
+        List<CreateProductDTO> result = productService.getAllProduct();
 
         assertEquals(2, result.size());
         assertTrue(result.containsAll(List.of(productDTO, disableProductDto)));
@@ -189,7 +189,7 @@ public class ProductServiceTest {
 
         when(productMapper.toProductDTO(product)).thenReturn(productDTO);
 
-        List<ProductDTO> result = productService.getAllProduct();
+        List<CreateProductDTO> result = productService.getAllProduct();
 
         assertEquals(1, result.size());
         assertTrue(result.contains(productDTO));
@@ -209,7 +209,7 @@ public class ProductServiceTest {
         );
         when(productMapper.toProductDTO(product)).thenReturn(productDTO);
 
-        List<ProductDTO> result = productService.getAllProductByStatus(STATUS_ENABLED.toString());
+        List<CreateProductDTO> result = productService.getAllProductByStatus(STATUS_ENABLED.toString());
 
         assertNotNull(result);
         assertEquals(1, result.size());
@@ -242,7 +242,7 @@ public class ProductServiceTest {
         when(authService.isEmployee()).thenReturn(true);
         when(productMapper.toProductDTO(product)).thenReturn(productDTO);
 
-        List<ProductDTO> result = productService.getProductByName("One");
+        List<CreateProductDTO> result = productService.getProductByName("One");
 
         assertEquals(1, result.size());
         assertEquals(result.get(0).name(), "product One");
@@ -255,7 +255,7 @@ public class ProductServiceTest {
     void getProductByName_shouldReturnAListOfAllProducts_whenUserManager(){
 
         Product disabledProduct = createDisabledProduct();
-        ProductDTO disabledProductDTO = createBasicDisabledProductDto();
+        CreateProductDTO disabledProductDTO = createBasicDisabledProductDto();
 
         List<Product> productList = new ArrayList<>();
         productList.add(product);
@@ -268,7 +268,7 @@ public class ProductServiceTest {
         when(productMapper.toProductDTO(product)).thenReturn(productDTO);
         when(productMapper.toProductDTO(disabledProduct)).thenReturn(disabledProductDTO);
 
-        List<ProductDTO> result = productService.getProductByName("One");
+        List<CreateProductDTO> result = productService.getProductByName("One");
 
         assertEquals(2, result.size());
         assertEquals(result.get(0).name(), "product One");
@@ -282,7 +282,7 @@ public class ProductServiceTest {
     @Test
     void createProductDto_shouldReturnACreatedProduct_whenValidInput(){
 
-       ProductDTO inputDTO = new ProductDTO(null, PRODUCT_NAME, STATUS_ENABLED.toString());
+       CreateProductDTO inputDTO = new CreateProductDTO(null, PRODUCT_NAME, STATUS_ENABLED.toString());
        Product nullIdProduct = createBasicEnabledProduct();
        nullIdProduct.setIdProduct(null);
 
@@ -290,7 +290,7 @@ public class ProductServiceTest {
         when(productRepository.save(nullIdProduct)).thenReturn(product);
         when(productMapper.toProductDTO(product)).thenReturn(productDTO);
 
-        ProductDTO result = productService.createProductDto(inputDTO);
+        CreateProductDTO result = productService.createProductDto(inputDTO);
 
         assertNotNull(result);
         assertEquals(1L, result.idProduct());
@@ -325,7 +325,7 @@ public class ProductServiceTest {
         Product initialProduct = createBasicEnabledProduct();
         initialProduct.setStatus(STATUS_DISABLED);
 
-        ProductDTO updateDto = new ProductDTO(PRODUCT_ID, "product Two", STATUS_ENABLED.toString());
+        CreateProductDTO updateDto = new CreateProductDTO(PRODUCT_ID, "product Two", STATUS_ENABLED.toString());
 
         when(productRepository.findById(PRODUCT_ID)).thenReturn(Optional.of(initialProduct));
         when(productRepository.save(any(Product.class)))
@@ -333,7 +333,7 @@ public class ProductServiceTest {
 
         when(productMapper.toProductDTO(any(Product.class))).thenReturn(updateDto);
 
-        ProductDTO result = productService.updateProduct(PRODUCT_ID, updateDto);
+        CreateProductDTO result = productService.updateProduct(PRODUCT_ID, updateDto);
 
         assertEquals("product Two", result.name());
         assertEquals("ENABLED", result.status());
@@ -352,7 +352,7 @@ public class ProductServiceTest {
     @Test
     void updateProduct_shouldThrowAnException_whenStatusInvalid(){
 
-        ProductDTO invalidDTO = new ProductDTO(PRODUCT_ID, PRODUCT_NAME, INVALID_STATUS);
+        CreateProductDTO invalidDTO = new CreateProductDTO(PRODUCT_ID, PRODUCT_NAME, INVALID_STATUS);
 
         InvalidRequestException exception = assertThrows(InvalidRequestException.class,
                 () -> productService.updateProduct(PRODUCT_ID, invalidDTO));

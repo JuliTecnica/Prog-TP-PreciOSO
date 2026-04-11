@@ -96,10 +96,11 @@ public class SupplierController {
     @Operation(summary = "Busca una página de proveedores", description = "Lista una página de proveedores")
     @GetMapping("/page")
     public ResponseEntity<Page<ViewSupplierDTO>> getSuppliers(
-            @ParameterObject @PageableDefault(size = 10) Pageable paginacion
+            @ParameterObject @PageableDefault(size = 5) Pageable paginacion,
+            @RequestParam(required = false) String name
             )
     {
-        return ResponseEntity.ok(supplierService.listSuppliers(paginacion));
+        return ResponseEntity.ok(supplierService.listSuppliersPage(paginacion,name));
     }
 
     @GetMapping("")
@@ -131,15 +132,6 @@ public class SupplierController {
             @Parameter(description = "Id de proveedor", example = "1")
             @PathVariable Long id) {
         return ResponseEntity.ok(supplierService.viewOneSupplier(id));
-    }
-
-    @GetMapping("name/{name}")
-    public ResponseEntity<Page<ViewSupplierDTO>> getSuppliersByName(
-            @Parameter(description = "Nombre de proveedor", example = "Nombre de proveedor")
-            @PathVariable String name,
-            @ParameterObject @PageableDefault(size = 10) Pageable paginacion)
-    {
-        return ResponseEntity.ok(supplierService.viewPageSuppliersByName(name,paginacion));
     }
 
     /**

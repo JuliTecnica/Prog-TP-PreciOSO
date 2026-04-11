@@ -19,17 +19,8 @@ import java.util.Optional;
 public interface UserRepository extends JpaRepository<User,Long>, QuerydslPredicateExecutor<User> {
 
     boolean existsByDni(String dni);
-
-    List<User> findAllByStatus(UserStatus status, Pageable pageable);
-
     boolean existsByCredentialRole(Role credentialRole);
-
-    List<User> findByCredential_Role(Role credentialRole, Pageable pageable);
-
-    List<User> findByCredential_RoleAndStatus(Role role, UserStatus userStatus, Pageable pageable);
-
     User findByCredential(Credential credential);
-
     Optional<User> findByCredential_Username(String credentialUsername);
 
 }

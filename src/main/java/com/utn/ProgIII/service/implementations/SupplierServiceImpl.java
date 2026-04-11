@@ -1,11 +1,14 @@
 package com.utn.ProgIII.service.implementations;
 
+import com.querydsl.core.BooleanBuilder;
 import com.utn.ProgIII.dto.AddSupplierDTO;
 import com.utn.ProgIII.exceptions.SupplierNotFoundException;
 import com.utn.ProgIII.mapper.SupplierMapper;
 import com.utn.ProgIII.model.Address.Address;
+import com.utn.ProgIII.model.Supplier.QSupplier;
 import com.utn.ProgIII.model.Supplier.Supplier;
 import com.utn.ProgIII.dto.ViewSupplierDTO;
+import com.utn.ProgIII.model.User.QUser;
 import com.utn.ProgIII.repository.SupplierRepository;
 import com.utn.ProgIII.service.interfaces.SupplierService;
 import com.utn.ProgIII.validations.SupplierValidations;
@@ -58,28 +61,6 @@ public class SupplierServiceImpl implements SupplierService {
         return suppliermapper.toViewSupplierDTO(sup);
     }
 
-
-
-    /**
-     * Una página que contiene los datos de provedores.
-     * <p>Se puede definir el tamaño con ?size=?</p>
-     * <p>Se puede definir el número de página con ?page=?</p>
-     * <p>Se puede ordenar según parámetro de objeto con ?sort=?</p>
-     * @param paginacion Una página con contenido e información
-     * @return Una página con contenido e información
-     */
-    public Page<ViewSupplierDTO> listSuppliers(Pageable paginacion)
-    {
-        Page<ViewSupplierDTO> page = supplierRepository.findAll(paginacion).map(suppliermapper::toViewSupplierDTO);
-
-        if(page.getNumberOfElements() == 0)
-        {
-            throw new SupplierNotFoundException("No hay proveedores");
-        }
-
-        return page;
-    }
-
     @Override
     public List<ViewSupplierDTO> listAllSuppliers() {
         List<ViewSupplierDTO> list = supplierRepository.findAll().stream().map(suppliermapper::toViewSupplierDTO).toList();
@@ -92,17 +73,6 @@ public class SupplierServiceImpl implements SupplierService {
         return list;
     }
 
-    @Override
-    public Page<ViewSupplierDTO> viewPageSuppliersByName(String name, Pageable pageable) {
-        Page<ViewSupplierDTO> page = supplierRepository.findByCompanyNameContaining(name,pageable).map(suppliermapper::toViewSupplierDTO);
-
-        if(page.isEmpty())
-        {
-            throw new SupplierNotFoundException("No hay proveedores");
-        }
-
-        return page;
-    }
 
     /**
      * Elimina un proveedor en caso de que exista
@@ -149,6 +119,17 @@ public class SupplierServiceImpl implements SupplierService {
         return suppliermapper.toViewSupplierDTO(supplierRepository.save(supplier_to_update));
     }
 
+    @Override
+    public Page<ViewSupplierDTO> listSuppliersPage(Pageable pageable, String name) {
 
+        QSupplier supplier = QSupplier.supplier;
+        BooleanBuilder builder = new BooleanBuilder().or(supplier.isNotNull());
 
+        if(name != null && !name.isBlank())
+        {
+            builder.and(supplier.companyName.likeIgnoreCase('%' + name + '%'));
+        }
+
+        return supplierRepository.findAll(builder, pageable).map(suppliermapper::toViewSupplierDTO);
+    }
 }

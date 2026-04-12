@@ -175,7 +175,8 @@ public class ProductServiceImpl implements ProductService {
 
         if (status != null && !authService.isEmployee())
         {
-            ProductStatus productStatus = ProductStatus.valueOf(status);
+            ProductStatus productStatus = ProductStatus.valueOf(status.toUpperCase());
+
             builder.and(product.status.eq(productStatus));
         }
 

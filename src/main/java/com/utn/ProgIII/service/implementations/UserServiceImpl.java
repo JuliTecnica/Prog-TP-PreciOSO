@@ -227,13 +227,13 @@ public class UserServiceImpl implements UserService {
 
         // Add status filter if provided
         if (status != null) {
-            UserStatus enum_status = UserStatus.valueOf(status);
+            UserStatus enum_status = UserStatus.valueOf(status.toUpperCase());
             builder.and(user.status.eq(enum_status));
         }
 
         // Add role filter if provided
         if (role != null) {
-            Role enum_role = Role.valueOf(role);
+            Role enum_role = Role.valueOf(role.toUpperCase());
             builder.and(user.credential.role.eq(enum_role));
         }
 

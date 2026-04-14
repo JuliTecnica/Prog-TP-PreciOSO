@@ -152,14 +152,15 @@ public class ProductServiceImpl implements ProductService {
 
     /**
      *
-     * @param pageable Objecto de paginación
-     * @param name Nombre del producto buscado
-     * @param status Estado del producto buscado
+     * @param pageable   Objecto de paginación
+     * @param name       Nombre del producto buscado
+     * @param status     Estado del producto buscado
      * @param categories Listado de categorias de productos (puede ser buscado individualmente)
+     * @param id Id del producto
      * @return Pagina de DTOs de productos
      */
     @Override
-    public Page<ProductDTO> getProductsPage(Pageable pageable, String name, String status, List<Long> categories) {
+    public Page<ProductDTO> getProductsPage(Pageable pageable, String name, String status, List<Long> categories, Long id) {
         QProduct product = QProduct.product;
         BooleanBuilder builder = new BooleanBuilder().or(product.isNotNull());
 
@@ -168,6 +169,10 @@ public class ProductServiceImpl implements ProductService {
             builder.and(product.name.likeIgnoreCase('%' + name + '%'));
         }
 
+        if(id != null)
+        {
+            builder.and(product.idProduct.eq(id));
+        }
 
         if(status != null && !EnumUtils.isValidEnum(ProductStatus.class, status.toUpperCase())) {
             throw new InvalidRequestException("Ese estado no está presente");

@@ -1,9 +1,11 @@
 package com.utn.ProgIII.service.implementations;
 
+import com.querydsl.core.BooleanBuilder;
 import com.utn.ProgIII.dto.*;
 import com.utn.ProgIII.exceptions.*;
 import com.utn.ProgIII.mapper.UserMapper;
 import com.utn.ProgIII.model.Credential.Role;
+import com.utn.ProgIII.model.User.QUser;
 import com.utn.ProgIII.model.User.User;
 import com.utn.ProgIII.model.User.UserStatus;
 import com.utn.ProgIII.repository.UserRepository;
@@ -14,12 +16,9 @@ import jakarta.annotation.PostConstruct;
 import jakarta.transaction.Transactional;
 import org.apache.commons.lang3.EnumUtils;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 /**
  * Clase que se encarga de la lógica entre el repositorio y el mapper
@@ -31,7 +30,6 @@ public class UserServiceImpl implements UserService {
     private final UserMapper userMapper;
     private final UserValidations userValidations;
     private final CredentialValidations credentialValidations;
-
     /**
      * Se crea un administrador en caso de que no exista
      */
@@ -120,58 +118,6 @@ public class UserServiceImpl implements UserService {
     }
 
     /**
-     * Una página que contiene los datos de usuarios.
-     * <p>Se puede definir el tamaño con ?size=?</p>
-     * <p>Se puede definir el número de página con ?page=?</p>
-     * <p>Se puede ordenar según parámetro de objeto con ?sort=?</p>
-     * @param paginacion Una página con contenido e información
-     * @return Una página con contenido e información
-     */
-    public Page<UserWithCredentialDTO> getUsersPage(Pageable paginacion)
-    {
-        Page<UserWithCredentialDTO> page = userRepository.findAll(paginacion).map(userMapper::toUserWithCredentialDTO);
-
-        if(page.getNumberOfElements() == 0)
-        {
-            throw new UserNotFoundException("No hay usuarios");
-        }
-
-        return page;
-    }
-
-    /**
-     * Muestra los datos de todos los usuarios presentes en el sistema, según el rol o estado
-     * @param role El rol de los usuarios que se desea ver
-     * @param status El estado de los usuarios que se desea ver
-     * @return Una lista con los DTO de cada usuario existente en el sistema
-     * @throws InvalidRequestException Si alguno de los parámetros tiene valores erróneos
-     * <p>
-     */
-    @Override
-    public Page<UserWithCredentialDTO> filterUsers(String role, String status,Pageable pageable) {
-        List<User> users;
-
-        if(role!= null && !EnumUtils.isValidEnum(Role.class, role.toUpperCase())) throw new InvalidRequestException("Ese rol no está presente");
-        if(status != null && !EnumUtils.isValidEnum(UserStatus.class, status.toUpperCase())) throw new InvalidRequestException("Ese estado no está presente");
-
-        if (role == null && status == null) {
-            users = userRepository.findAll(pageable).stream().toList();
-        } else if (status == null) {
-            users = userRepository.findByCredential_Role(Role.valueOf(role.toUpperCase()),pageable);
-        } else if (role == null) {
-            users = userRepository.findAllByStatus(UserStatus.valueOf(status.toUpperCase()),pageable);
-        } else {
-            users = userRepository.findByCredential_RoleAndStatus(Role.valueOf(role.toUpperCase()),UserStatus.valueOf(status.toUpperCase()),pageable);
-        }
-
-        if (users.isEmpty()) {
-            throw new UserNotFoundException("No se encontraron usuarios");
-        }
-
-        return new PageImpl<UserWithCredentialDTO>(users.stream().map(userMapper::toUserWithCredentialDTO).toList());
-    }
-
-    /**
      * Obtiene los datos del usuario solicitado por parámetro y los reemplaza por los enviados en la request.
      * @param id El ID correspondiente al usuario que se solicitó modificar sus datos
      * @param dto El objeto de transferencia con los nuevos datos recibidos desde la request
@@ -255,4 +201,42 @@ public class UserServiceImpl implements UserService {
             userRepository.delete(user);
     }
 
+
+    /**
+     * Muestra los datos de todos los usuarios presentes en el sistema, según el rol o estado
+     * @param role El rol de los usuarios que se desea ver
+     * @param status El estado de los usuarios que se desea ver
+     * @return Una lista con los DTO de cada usuario existente en el sistema
+     * @throws InvalidRequestException Si alguno de los parámetros tiene valores erróneos
+     * <p>
+     */
+    @Override
+    public Page<UserWithCredentialDTO> getUsersPage(Pageable pageable, String status, String role)
+    {
+        QUser user = QUser.user;
+        BooleanBuilder builder = new BooleanBuilder().or(user.isNotNull());
+
+        if(role != null && !EnumUtils.isValidEnum(Role.class, role.toUpperCase())) {
+            throw new InvalidRequestException("Ese rol no está presente");
+        }
+
+        if(status != null && !EnumUtils.isValidEnum(UserStatus.class, status.toUpperCase()))
+        {
+            throw new InvalidRequestException("Ese estado no está presente");
+        }
+
+        // Add status filter if provided
+        if (status != null) {
+            UserStatus enum_status = UserStatus.valueOf(status.toUpperCase());
+            builder.and(user.status.eq(enum_status));
+        }
+
+        // Add role filter if provided
+        if (role != null) {
+            Role enum_role = Role.valueOf(role.toUpperCase());
+            builder.and(user.credential.role.eq(enum_role));
+        }
+
+        return userRepository.findAll(builder, pageable).map(userMapper::toUserWithCredentialDTO);
+    }
 }

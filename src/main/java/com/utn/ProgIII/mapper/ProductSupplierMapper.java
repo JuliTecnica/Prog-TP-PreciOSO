@@ -1,7 +1,7 @@
 package com.utn.ProgIII.mapper;
 
+import com.utn.ProgIII.dto.*;
 import com.utn.ProgIII.model.ProductSupplier.ProductSupplier;
-import com.utn.ProgIII.dto.ResponseProductSupplierDTO;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -18,6 +18,51 @@ public class ProductSupplierMapper {
                 productSupplier.getSupplier().getIdSupplier(),
                 productSupplier.getSupplier().getCompanyName(),
                 productSupplier.getCost()
+        );
+    }
+
+    public ExtendedProductManagerDTO fromEntityToExtendedProductDTO(ProductSupplier productSupplier, Double dolar_price)
+    {
+        return new ExtendedProductManagerDTO(
+                productSupplier.getIdProductSupplier(),
+                productSupplier.getProduct().getIdProduct(),
+                productSupplier.getProduct().getName(),
+                productSupplier.getCost(),
+                productSupplier.getCost()/dolar_price
+        );
+    }
+
+    public ExtendedProductManagerDTONoDollarPrice fromEntityToExtendedProductDTODolarless(ProductSupplier productSupplier)
+    {
+        return new ExtendedProductManagerDTONoDollarPrice(
+                productSupplier.getIdProductSupplier(),
+                productSupplier.getProduct().getIdProduct(),
+                productSupplier.getProduct().getName(),
+                productSupplier.getCost(),
+                "not available"
+        );
+    }
+
+
+    public ProductPriceSupplierManagerDTO fromEntityToExtendedSupplierDTO(ProductSupplier productSupplier, Double dolar_price)
+    {
+        return new ProductPriceSupplierManagerDTO(
+                productSupplier.getIdProductSupplier(),
+                productSupplier.getSupplier().getIdSupplier(),
+                productSupplier.getSupplier().getCompanyName(),
+                productSupplier.getCost(),
+                productSupplier.getCost()/dolar_price
+        );
+    }
+
+    public ProductPriceSupplierManagerDTONoDollarPrice fromEntityToExtendedSupplierDTODolarless(ProductSupplier productSupplier)
+    {
+        return new ProductPriceSupplierManagerDTONoDollarPrice(
+                productSupplier.getIdProductSupplier(),
+                productSupplier.getSupplier().getIdSupplier(),
+                productSupplier.getSupplier().getCompanyName(),
+                productSupplier.getCost(),
+                "not available"
         );
     }
 }

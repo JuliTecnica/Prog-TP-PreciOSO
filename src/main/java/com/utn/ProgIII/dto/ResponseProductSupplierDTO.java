@@ -16,10 +16,6 @@ public record ResponseProductSupplierDTO(
         @Schema(example = "Compañía Test")
         String supplierName,
         @Schema(example = "200")
-        BigDecimal cost
-//        @Schema(example = "30")
-//        BigDecimal profitMargin,
-//        @Schema(example = "260")
-//        BigDecimal price)
+        Double cost
 ){
 }

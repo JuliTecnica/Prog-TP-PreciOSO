@@ -66,7 +66,7 @@ public class CsvReader {
             {
                 var product = new ProductInfoFromCsvDTO(
                         item.get("nombre"),
-                        new BigDecimal(item.get("precio"))
+                        Double.valueOf(item.get("precio"))
                 );
 
                 item_list.add(product);

@@ -210,6 +210,7 @@ public class ProductServiceImpl implements ProductService {
                 .orElseThrow(() -> new ProductNotFoundException("Producto no encontrado"));
 
         product.setStatus(ProductStatus.DISABLED);
+        product.setPrice(null);
         productSupplierRepository.removeAllByProduct_IdProduct(id);
 
         productRepository.save(product);

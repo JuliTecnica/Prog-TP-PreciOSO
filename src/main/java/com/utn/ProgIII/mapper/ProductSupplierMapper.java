@@ -28,7 +28,7 @@ public class ProductSupplierMapper {
                 productSupplier.getProduct().getIdProduct(),
                 productSupplier.getProduct().getName(),
                 productSupplier.getCost(),
-                productSupplier.getCost()/dolar_price
+                shortenDouble(productSupplier.getCost()/dolar_price)
         );
     }
 
@@ -51,7 +51,7 @@ public class ProductSupplierMapper {
                 productSupplier.getSupplier().getIdSupplier(),
                 productSupplier.getSupplier().getCompanyName(),
                 productSupplier.getCost(),
-                productSupplier.getCost()/dolar_price
+                shortenDouble(productSupplier.getCost()/dolar_price)
         );
     }
 
@@ -64,6 +64,13 @@ public class ProductSupplierMapper {
                 productSupplier.getCost(),
                 "not available"
         );
+    }
+
+
+    public Double shortenDouble(Double number)
+    {
+        String s = String.format("%.5f", number);
+        return Double.parseDouble(s);
     }
 }
 

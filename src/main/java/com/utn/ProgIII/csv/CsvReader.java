@@ -25,6 +25,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.Predicate;
 
 @Component
 /*
@@ -97,6 +98,10 @@ public class CsvReader {
 
         try {
             uploads = readFile(csvFilePath).stream().filter(this::IsProductInfoValid).toList();
+
+            failedUploads.addAll(uploads.stream().filter((x) -> x.cost() <= 0).toList());
+            uploads = uploads.stream().filter((x) -> x.cost() > 0).toList();
+
             Supplier supplierData = supplierRepository.getReferenceById(supplierId);
 
             for (ProductInfoFromCsvDTO productUpdateInfo: uploads) {
@@ -133,6 +138,9 @@ public class CsvReader {
         try {
             uploads = readFile(csvFilePath).stream().filter(this::IsProductInfoValid).toList();
             Supplier supplierData = supplierRepository.getReferenceById(supplierId);
+
+            failedUploads.addAll(uploads.stream().filter((x) -> x.cost() <= 0).toList());
+            uploads = uploads.stream().filter((x) -> x.cost() > 0).toList();
 
             for (ProductInfoFromCsvDTO productUpdateInfo: uploads) {
                 Product productData = productRepository.getByName(productUpdateInfo.name());
@@ -198,4 +206,5 @@ public class CsvReader {
             productRepository.save(product);
         }
     }
+
 }

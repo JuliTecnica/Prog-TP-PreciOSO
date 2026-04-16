@@ -12,8 +12,8 @@ public record ExtendedProductManagerDTO(
         @Schema(example = "Pasas de uva")
         String name,
         @Schema(example = "200")
-        BigDecimal cost,
+        Double cost,
         @Schema(example = "0.01")
-        BigDecimal dollarPrice
+        Double dollarPrice
 ) {
 }

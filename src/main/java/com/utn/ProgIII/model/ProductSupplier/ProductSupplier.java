@@ -39,9 +39,9 @@ public class ProductSupplier {
 
     @NotNull(message = "El costo no puede estar vacío")
     @Positive(message = "El costo no puede ser negativo")
-    private BigDecimal cost;
+    private Double cost;
 
-    public ProductSupplier(Supplier supplier, Product product, BigDecimal cost){
+    public ProductSupplier(Supplier supplier, Product product, Double cost){
         this.supplier = supplier;
         this.product = product;
         this.cost = cost;

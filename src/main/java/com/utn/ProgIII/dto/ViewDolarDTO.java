@@ -12,9 +12,9 @@ public record ViewDolarDTO(
         @Schema(example = "oficial")
         String casa,
         @Schema(example = "1200")
-        BigDecimal venta,
+        Double venta,
         @Schema(example = "1150")
-        BigDecimal compra,
+        Double compra,
         @Schema(example = "2025-06-11T09:46:00.000Z")
         String ultima_actualizacion
 ){}

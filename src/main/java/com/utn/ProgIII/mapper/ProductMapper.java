@@ -33,7 +33,7 @@ public class ProductMapper {
         CategoryDTO category = categoryMapper.toDTO(product.getCategory());
         Double price = calculateClientPrice(product.getPrice(),profitMargin);
 
-        return new ProductDTO(idProduct,name,status, profitMargin, stock,price,category);
+        return new ProductDTO(idProduct,name,status, profitMargin * 100, stock,price,category);
     }
 
     /**
@@ -53,7 +53,7 @@ public class ProductMapper {
 
         result.setStatus(productDTO.status() == null ? ProductStatus.ENABLED : ProductStatus.valueOf(productDTO.status().toUpperCase()));
 
-        result.setProfitMargin(productDTO.profitMargin());
+        result.setProfitMargin(productDTO.profitMargin() / 100);
         result.setStock(productDTO.stock());
 
         return result;

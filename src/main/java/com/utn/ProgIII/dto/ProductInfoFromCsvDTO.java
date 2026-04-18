@@ -11,5 +11,5 @@ public record ProductInfoFromCsvDTO(
         String name,
 
         @JsonProperty("precio")
-        BigDecimal cost) {
+        Double cost) {
 }

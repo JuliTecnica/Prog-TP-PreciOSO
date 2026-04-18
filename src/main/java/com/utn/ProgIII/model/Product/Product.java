@@ -40,6 +40,8 @@ public class Product {
 
     private Integer stock;
 
+    private Double price;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @NotAudited
     @JoinColumn(name = "category_id")

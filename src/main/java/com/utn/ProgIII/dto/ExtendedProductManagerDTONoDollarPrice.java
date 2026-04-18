@@ -12,11 +12,7 @@ public record ExtendedProductManagerDTONoDollarPrice(
         @Schema(example = "Pasas de uva")
         String name,
         @Schema(example = "200")
-        BigDecimal cost,
-//        @Schema(example = "30")
-//        BigDecimal profitMargin,
-//        @Schema(example = "260")
-//        BigDecimal price,
+        Double cost,
         @Schema(example = "not available")
         String dollarPrice
 ) {

@@ -10,5 +10,5 @@ public record UpdateProductSupplierDTO(
         @Schema(example = "300")
         @NotNull(message = "El costo no puede ser nulo")
         @PositiveOrZero(message = "El costo no puede ser menor a 0")
-        BigDecimal cost) {
+        Double cost) {
 }

@@ -1,5 +1,6 @@
 package com.utn.ProgIII.service.implementations;
 
+import com.querydsl.core.BooleanBuilder;
 import com.utn.ProgIII.csv.CsvReader;
 import com.utn.ProgIII.dto.*;
 import com.utn.ProgIII.exceptions.*;
@@ -20,6 +21,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.util.Optional;
 
 @Service
 /*
@@ -33,7 +35,6 @@ public class ProductSupplierServiceImpl implements ProductSupplierService {
     private final ProductSupplierMapper mapper;
     private final ProductSupplierValidations productSupplierValidations;
     private final CsvReader csvReader;
-    private final AuthService authService;
     private final MiscService miscService;
 
     public ProductSupplierServiceImpl(ProductSupplierRepository productSupplierRepository,
@@ -42,7 +43,6 @@ public class ProductSupplierServiceImpl implements ProductSupplierService {
                                       ProductSupplierMapper mapper,
                                       ProductSupplierValidations productSupplierValidations,
                                       CsvReader csvReader,
-                                      AuthService authService,
                                       MiscService miscService
     ){
 
@@ -52,7 +52,6 @@ public class ProductSupplierServiceImpl implements ProductSupplierService {
         this.mapper = mapper;
         this.productSupplierValidations = productSupplierValidations;
         this.csvReader = csvReader;
-        this.authService = authService;
         this.miscService = miscService;
     }
 
@@ -84,6 +83,25 @@ public class ProductSupplierServiceImpl implements ProductSupplierService {
 
         productSupplierValidations.validateRelationship(productSupplier);
 
+        Optional<Double> optional = productSupplierRepository.findTopCostInProduct(productSupplier.getProduct().getIdProduct());
+
+
+        boolean change_price = false;
+
+        if(optional.isEmpty())
+        {
+            change_price = true;
+        } else if (optional.get() < createProductSupplierDTO.cost()) {
+            change_price = true;
+        }
+
+
+        if(change_price)
+        {
+            product.setPrice(createProductSupplierDTO.cost());
+            productRepository.save(product);
+        }
+
         productSupplierRepository.save(productSupplier);
 
         return mapper.fromEntityToDto(productSupplier);
@@ -91,11 +109,27 @@ public class ProductSupplierServiceImpl implements ProductSupplierService {
 
     @Override
     public void deleteProductSupplier(Long idProductSupplier) {
-        if (productSupplierRepository.existsById(idProductSupplier)) {
-            productSupplierRepository.deleteById(idProductSupplier);
-        } else {
-            throw new ProductSupplierNotExistException("Esa relación no existe");
+        ProductSupplier productSupplier = productSupplierRepository.findById(idProductSupplier).orElseThrow(() -> new NotFoundException("Ese relación no existe!"));
+        Optional<Double> optional = productSupplierRepository.findTopCostInProduct(productSupplier.getProduct().getIdProduct());
+        boolean prices_match = optional.isPresent() && optional.get().equals(productSupplier.getCost());
+
+        productSupplierRepository.delete(productSupplier);
+
+        if(prices_match)
+        {
+            optional = productSupplierRepository.findTopCostInProduct(productSupplier.getProduct().getIdProduct());
+            Product product = productSupplier.getProduct();
+
+            if(optional.isPresent())
+            {
+                product.setPrice(optional.get());
+            } else {
+                product.setPrice(null);
+            }
+
+            productRepository.save(product);
         }
+
     }
 
     /**
@@ -110,11 +144,28 @@ public class ProductSupplierServiceImpl implements ProductSupplierService {
         ProductSupplier productSupplier = productSupplierRepository.findById(id)
                 .orElseThrow(() -> new ProductSupplierNotExistException("La relación que quiere editar no se encuentra"));
 
-        BigDecimal newCost = updateProductSupplierDTO.cost();
-
+        Double newCost = updateProductSupplierDTO.cost();
         productSupplier.setCost(newCost);
 
+        Product product = productSupplier.getProduct();
+
         productSupplierRepository.save(productSupplier);
+        Optional<Double> optional = productSupplierRepository.findTopCostInProduct(productSupplier.getProduct().getIdProduct());
+
+        boolean modify_product = false;
+        if(optional.isEmpty())
+        {
+            modify_product = true;
+        } else if (optional.get() <= updateProductSupplierDTO.cost()) {
+            modify_product = true;
+        }
+
+        if(modify_product)
+        {
+            product.setPrice(updateProductSupplierDTO.cost());
+            productRepository.save(product);
+        }
+
 
         return mapper.fromEntityToDto(productSupplier);
     }
@@ -132,28 +183,30 @@ public class ProductSupplierServiceImpl implements ProductSupplierService {
         Supplier supplier = supplierRepository.findById(companyId)
                 .orElseThrow(() -> new SupplierNotFoundException("El proveedor no existe"));
 
+        QProductSupplier qProductSupplier = QProductSupplier.productSupplier;
+        BooleanBuilder booleanBuilder = new BooleanBuilder().or(qProductSupplier.isNotNull());
+        booleanBuilder.and(qProductSupplier.supplier.idSupplier.eq(companyId));
+
         Page<?> priceList;
+        Double dolar = -1.0;
 
+        try {
+            dolar = miscService.searchDollarPrice(exchange_rate).venta();
+        } catch (UnexpectedServerErrorException ignored) {}
 
-        if (!authService.isEmployee()) {
-            try {
-                BigDecimal dolar = miscService.searchDollarPrice(exchange_rate).venta();
-
-                priceList = productSupplierRepository.productsBySupplierManager(pageable, supplier.getIdSupplier(),dolar);
-            } catch (UnexpectedServerErrorException e) {
-                priceList = productSupplierRepository.productsBySupplierManagerFallback(pageable, supplier.getIdSupplier());
-            }
+        if(dolar != -1.0)
+        {
+            Double finalDolar = dolar;
+            priceList = productSupplierRepository.findAll(booleanBuilder, pageable).map((x) -> mapper.fromEntityToExtendedProductDTO(x, finalDolar));
         } else {
-            priceList = productSupplierRepository.productsBySupplierEmployee(pageable, supplier.getIdSupplier());
+            priceList = productSupplierRepository.findAll(booleanBuilder, pageable).map(mapper::fromEntityToExtendedProductDTODolarless);
         }
-
 
         return new SupplierProductListDTO(
                 supplier.getIdSupplier(),
                 supplier.getCompanyName(),
                 priceList
         );
-
     }
 
     /**
@@ -170,19 +223,24 @@ public class ProductSupplierServiceImpl implements ProductSupplierService {
             throw new ProductNotFoundException("El producto está desactivado, y no tendrá precios.");
         }
 
+
+        QProductSupplier qProductSupplier = QProductSupplier.productSupplier;
+        BooleanBuilder booleanBuilder = new BooleanBuilder().or(qProductSupplier.isNotNull());
+        booleanBuilder.and(qProductSupplier.product.idProduct.eq(idProduct));
+
         Page<?> priceList;
+        Double dolar = -1.0;
 
-      
-        if(!authService.isEmployee()){
-            try {
-                BigDecimal dolar = miscService.searchDollarPrice(exchange_rate).venta();
+        try {
+            dolar = miscService.searchDollarPrice(exchange_rate).venta();
+        } catch (UnexpectedServerErrorException ignored) {}
 
-                priceList = productSupplierRepository.listPricesByProductManager(pageable,idProduct,dolar);
-            } catch (UnexpectedServerErrorException e) {
-                priceList = productSupplierRepository.listPricesByProductManagerFallback(pageable,idProduct);
-            }
+        if(dolar != -1.0)
+        {
+            Double finalDolar = dolar;
+            priceList = productSupplierRepository.findAll(booleanBuilder, pageable).map((x) -> mapper.fromEntityToExtendedSupplierDTO(x, finalDolar));
         } else {
-           priceList = productSupplierRepository.listPricesByProductEmployee(pageable,idProduct);
+            priceList = productSupplierRepository.findAll(booleanBuilder, pageable).map(mapper::fromEntityToExtendedSupplierDTODolarless);
         }
 
         return new ProductPricesDTO(product.getIdProduct(),product.getName(),priceList);

@@ -198,6 +198,29 @@ public class ProductServiceImpl implements ProductService {
         return productRepository.findAll(builder,pageable).map(productMapper::toProductDTO);
     }
 
+    @Override
+    public Page<ProductDTO> getProductsOnSale(Pageable pageable, String name, List<Long> categories, boolean include_oos) {
+        QProduct qProduct = QProduct.product;
+        BooleanBuilder booleanBuilder = new BooleanBuilder().or(qProduct.isNotNull());
+
+        booleanBuilder.and(qProduct.status.eq(ProductStatus.ENABLED));
+        booleanBuilder.and(qProduct.price.isNotNull());
+
+        if(!categories.isEmpty())
+        {
+            booleanBuilder.and(qProduct.category.idCategory.in(categories));
+        }
+
+        if(include_oos)
+        {
+            booleanBuilder.and(qProduct.stock.goe(0));
+        } else {
+            booleanBuilder.and(qProduct.stock.goe(1));
+        }
+
+        return productRepository.findAll(booleanBuilder, pageable).map(productMapper::toProductDTO);
+    }
+
     /**
      * Se da de baja (lógica) un producto según su ID, también se eliminan las relaciones de los proveedores
      * @param id identificador único del producto

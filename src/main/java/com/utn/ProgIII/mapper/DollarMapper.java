@@ -17,8 +17,8 @@ public class DollarMapper {
         String moneda = jsonObject.getString("moneda");
         String nombre = jsonObject.getString("nombre");
         String casa = jsonObject.getString("casa");
-        BigDecimal venta = jsonObject.getBigDecimal("venta");
-        BigDecimal compra = jsonObject.getBigDecimal("compra");
+        Double venta = jsonObject.getDouble("venta");
+        Double compra = jsonObject.getDouble("compra");
         String ultima_actualizacion = jsonObject.getString("fechaActualizacion");
 
         return new ViewDolarDTO(moneda,nombre,casa,venta,compra,ultima_actualizacion);

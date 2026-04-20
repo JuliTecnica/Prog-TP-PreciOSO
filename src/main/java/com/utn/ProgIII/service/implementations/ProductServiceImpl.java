@@ -4,6 +4,7 @@ import com.querydsl.core.BooleanBuilder;
 import com.utn.ProgIII.dto.CreateProductDTO;
 
 import com.utn.ProgIII.dto.ProductDTO;
+import com.utn.ProgIII.dto.ViewProductCustomer;
 import com.utn.ProgIII.exceptions.*;
 import com.utn.ProgIII.mapper.ProductMapper;
 import com.utn.ProgIII.model.Product.Category;
@@ -199,7 +200,7 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public Page<ProductDTO> getProductsOnSale(Pageable pageable, String name, List<Long> categories, boolean include_oos) {
+    public Page<ViewProductCustomer> getProductsOnSale(Pageable pageable, String name, List<Long> categories, boolean include_oos) {
         QProduct qProduct = QProduct.product;
         BooleanBuilder booleanBuilder = new BooleanBuilder().or(qProduct.isNotNull());
 
@@ -218,7 +219,7 @@ public class ProductServiceImpl implements ProductService {
             booleanBuilder.and(qProduct.stock.goe(1));
         }
 
-        return productRepository.findAll(booleanBuilder, pageable).map(productMapper::toProductDTO);
+        return productRepository.findAll(booleanBuilder, pageable).map(productMapper::toViewCustomerDTO);
     }
 
     /**

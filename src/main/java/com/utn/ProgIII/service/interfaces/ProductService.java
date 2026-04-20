@@ -2,6 +2,7 @@ package com.utn.ProgIII.service.interfaces;
 
 import com.utn.ProgIII.dto.CreateProductDTO;
 import com.utn.ProgIII.dto.ProductDTO;
+import com.utn.ProgIII.dto.ViewProductCustomer;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -16,5 +17,5 @@ public interface ProductService {
     ProductDTO updateProduct (Long id, CreateProductDTO productDto);
     void deleteProduct (Long id);
     Page<ProductDTO> getProductsPage(Pageable pageable, String name, String status, List<Long> categories, Long id);
-    Page<ProductDTO> getProductsOnSale(Pageable pageable, String name, List<Long> categories, boolean include_oos);
+    Page<ViewProductCustomer> getProductsOnSale(Pageable pageable, String name, List<Long> categories, boolean include_oos);
 }

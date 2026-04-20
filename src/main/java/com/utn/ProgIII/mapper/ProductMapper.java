@@ -3,6 +3,7 @@ package com.utn.ProgIII.mapper;
 import com.utn.ProgIII.dto.CategoryDTO;
 import com.utn.ProgIII.dto.CreateProductDTO;
 import com.utn.ProgIII.dto.ProductDTO;
+import com.utn.ProgIII.dto.ViewProductCustomer;
 import com.utn.ProgIII.exceptions.InvalidRequestException;
 import com.utn.ProgIII.model.Product.Product;
 import com.utn.ProgIII.model.Product.ProductStatus;
@@ -57,6 +58,19 @@ public class ProductMapper {
         result.setStock(productDTO.stock());
 
         return result;
+    }
+
+
+    public ViewProductCustomer toViewCustomerDTO(Product product)
+    {
+        Long idProduct = product.getIdProduct();
+        String name = product.getName();
+        Double profitMargin = product.getProfitMargin();
+        Integer stock = product.getStock();
+        CategoryDTO category = categoryMapper.toDTO(product.getCategory());
+        Double price = calculateClientPrice(product.getPrice(),profitMargin);
+
+        return new ViewProductCustomer(idProduct,name,stock,price,category);
     }
 
     public Double calculateClientPrice(Double cost, Double profit_margin)

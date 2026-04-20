@@ -2,6 +2,7 @@ package com.utn.ProgIII.controller;
 
 import com.utn.ProgIII.dto.CreateProductDTO;
 import com.utn.ProgIII.dto.ProductDTO;
+import com.utn.ProgIII.dto.ViewProductCustomer;
 import com.utn.ProgIII.service.interfaces.ProductService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -163,7 +164,7 @@ public class ProductController {
             mediaType = "application/json",
             array = @ArraySchema(schema = @Schema(implementation = ProductDTO.class))
     ))
-    public ResponseEntity<Page<ProductDTO>> getProductsOnSale(
+    public ResponseEntity<Page<ViewProductCustomer>> getProductsOnSale(
             @ParameterObject @PageableDefault(size = 5) Pageable paginacion,
             @RequestParam(required = false) String name,
             @RequestParam(required = false) List<Long> category,

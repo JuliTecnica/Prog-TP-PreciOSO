@@ -207,6 +207,11 @@ public class ProductServiceImpl implements ProductService {
         booleanBuilder.and(qProduct.status.eq(ProductStatus.ENABLED));
         booleanBuilder.and(qProduct.price.isNotNull());
 
+        if(name != null)
+        {
+            booleanBuilder.and(qProduct.name.likeIgnoreCase('%' + name + '%'));
+        }
+
         if(categories != null && !categories.isEmpty())
         {
             booleanBuilder.and(qProduct.category.idCategory.in(categories));

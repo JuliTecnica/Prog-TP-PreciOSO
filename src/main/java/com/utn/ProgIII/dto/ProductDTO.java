@@ -14,6 +14,8 @@ public record ProductDTO(
         Double profitMargin,
         @Schema(example = "1.5")
         Integer stock,
+        @Schema(example = "200")
+        Double price,
         @Schema(example = "1")
         CategoryDTO category) {
 }

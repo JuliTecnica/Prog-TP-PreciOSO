@@ -31,8 +31,9 @@ public class ProductMapper {
         Double profitMargin = product.getProfitMargin();
         Integer stock = product.getStock();
         CategoryDTO category = categoryMapper.toDTO(product.getCategory());
+        Double price = calculateClientPrice(product.getPrice(),profitMargin);
 
-        return new ProductDTO(idProduct,name,status, profitMargin, stock, category);
+        return new ProductDTO(idProduct,name,status, profitMargin * 100, stock,price,category);
     }
 
     /**
@@ -52,9 +53,15 @@ public class ProductMapper {
 
         result.setStatus(productDTO.status() == null ? ProductStatus.ENABLED : ProductStatus.valueOf(productDTO.status().toUpperCase()));
 
-        result.setProfitMargin(productDTO.profitMargin());
+        result.setProfitMargin(productDTO.profitMargin() / 100);
         result.setStock(productDTO.stock());
 
         return result;
+    }
+
+    public Double calculateClientPrice(Double cost, Double profit_margin)
+    {
+        if(cost == null) return null;
+        return cost + (profit_margin * cost);
     }
 }

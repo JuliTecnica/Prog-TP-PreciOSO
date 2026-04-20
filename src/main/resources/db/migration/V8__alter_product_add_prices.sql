@@ -1,0 +1,2 @@
+ALTER TABLE product
+ADD COLUMN price DOUBLE(10,2);

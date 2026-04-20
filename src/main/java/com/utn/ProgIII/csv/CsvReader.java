@@ -24,6 +24,8 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import java.util.function.Predicate;
 
 @Component
 /*
@@ -96,6 +98,10 @@ public class CsvReader {
 
         try {
             uploads = readFile(csvFilePath).stream().filter(this::IsProductInfoValid).toList();
+
+            failedUploads.addAll(uploads.stream().filter((x) -> x.cost() <= 0).toList());
+            uploads = uploads.stream().filter((x) -> x.cost() > 0).toList();
+
             Supplier supplierData = supplierRepository.getReferenceById(supplierId);
 
             for (ProductInfoFromCsvDTO productUpdateInfo: uploads) {
@@ -103,7 +109,9 @@ public class CsvReader {
                 ProductSupplier relationship = productSupplierRepository.getByProductAndSupplier(productData,supplierData);
                 if (productData != null && productData.getStatus().equals(ProductStatus.ENABLED) && relationship != null) {
                     relationship = updateRelationshipPricing(productUpdateInfo,relationship);
+
                     productSupplierRepository.save(relationship);
+                    handlePriceUpdate(productData, productUpdateInfo.cost());
                 } else {
                     failedUploads.add(productUpdateInfo);
                 }
@@ -131,13 +139,18 @@ public class CsvReader {
             uploads = readFile(csvFilePath).stream().filter(this::IsProductInfoValid).toList();
             Supplier supplierData = supplierRepository.getReferenceById(supplierId);
 
+            failedUploads.addAll(uploads.stream().filter((x) -> x.cost() <= 0).toList());
+            uploads = uploads.stream().filter((x) -> x.cost() > 0).toList();
+
             for (ProductInfoFromCsvDTO productUpdateInfo: uploads) {
                 Product productData = productRepository.getByName(productUpdateInfo.name());
                 ProductSupplier relationship = productSupplierRepository.getByProductAndSupplier(productData,supplierData);
 
                 if (productData != null && productData.getStatus().equals(ProductStatus.ENABLED) && relationship == null) {
                     relationship = new ProductSupplier(supplierData,productData,productUpdateInfo.cost());
+
                     productSupplierRepository.save(relationship);
+                    handlePriceUpdate(productData, productUpdateInfo.cost());
                 } else {
                     failedUploads.add(productUpdateInfo);
                 }
@@ -173,4 +186,25 @@ public class CsvReader {
     {
         return item.containsKey("precio") && item.containsKey("nombre");
     }
+
+    private void handlePriceUpdate(Product product, Double new_price)
+    {
+        Optional<Double> optional = productSupplierRepository.findTopCostInProduct(product.getIdProduct());
+
+        boolean should_update = false;
+        if(optional.isEmpty())
+        {
+            should_update = true;
+        } else if(optional.get() <= new_price)
+        {
+            should_update = true;
+        }
+
+        if(should_update)
+        {
+            product.setPrice(new_price);
+            productRepository.save(product);
+        }
+    }
+
 }

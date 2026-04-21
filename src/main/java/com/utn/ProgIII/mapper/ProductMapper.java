@@ -33,8 +33,9 @@ public class ProductMapper {
         Integer stock = product.getStock();
         CategoryDTO category = categoryMapper.toDTO(product.getCategory());
         Double price = calculateClientPrice(product.getPrice(),profitMargin);
+        String image_url = product.getImage_url();
 
-        return new ProductDTO(idProduct,name,status, profitMargin * 100, stock,price,category);
+        return new ProductDTO(idProduct,name,status, profitMargin * 100, stock,price,category,image_url);
     }
 
     /**

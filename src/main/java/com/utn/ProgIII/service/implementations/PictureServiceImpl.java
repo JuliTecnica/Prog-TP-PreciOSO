@@ -4,19 +4,23 @@ import com.utn.ProgIII.exceptions.InternalServerError;
 import com.utn.ProgIII.service.interfaces.PictureService;
 
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.text.SimpleDateFormat;
 
 @Service
 public class PictureServiceImpl implements PictureService {
 
     @Override
     public String uploadPicture(String path, MultipartFile file) {
+        String extension = "." + StringUtils.getFilenameExtension(file.getOriginalFilename());
+        String filename = new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss").format(new java.util.Date()) + extension;
 
-        String filename = file.getOriginalFilename();
+
 
         String filepath = path + File.separator + filename;
 

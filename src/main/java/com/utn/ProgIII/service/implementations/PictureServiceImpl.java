@@ -1,6 +1,7 @@
 package com.utn.ProgIII.service.implementations;
 
 import com.utn.ProgIII.exceptions.InternalServerError;
+import com.utn.ProgIII.exceptions.NotFoundException;
 import com.utn.ProgIII.service.interfaces.PictureService;
 
 import org.springframework.stereotype.Service;
@@ -49,7 +50,7 @@ public class PictureServiceImpl implements PictureService {
             file = new FileInputStream(fullpath);
         } catch (FileNotFoundException e)
         {
-            file = null;
+            throw new NotFoundException("Archivo no encontrado!");
         }
 
         return file;

@@ -1,8 +1,12 @@
 package com.utn.ProgIII.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.utn.ProgIII.dto.CreateProductDTO;
 import com.utn.ProgIII.dto.ProductDTO;
 import com.utn.ProgIII.dto.ViewProductCustomer;
+import com.utn.ProgIII.exceptions.BadRequestException;
 import com.utn.ProgIII.service.interfaces.ProductService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -19,6 +23,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -51,15 +56,34 @@ public class ProductController {
             schema = @Schema(implementation = ProblemDetail.class)
     ))
     public ResponseEntity<ProductDTO> addProduct (
+            /*
             @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "El producto para crear")
-            @RequestBody CreateProductDTO productDTO
-    ){
+            @RequestPart CreateProductDTO productDTO,
+            @RequestPart MultipartFile image
+            */
+            @RequestPart MultipartFile file,
+            @RequestPart String productData
+            ){
 
-        ProductDTO response = productService.createProductDto(productDTO);
+        CreateProductDTO productDTO = transformDataToCreateProductDTO(productData);
+        ProductDTO response = productService.createProductDto(productDTO, file);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
+    public CreateProductDTO transformDataToCreateProductDTO(String productDto)
+    {
+        ObjectMapper objectMapper = new ObjectMapper();
+
+        CreateProductDTO productDTO;
+        try {
+            productDTO = objectMapper.readValue(productDto, CreateProductDTO.class);
+        } catch (JsonProcessingException e) {
+            throw new BadRequestException("Hay datos faltantes!");
+        }
+
+        return productDTO;
+    }
 
     //muestra 1 solo producto
 

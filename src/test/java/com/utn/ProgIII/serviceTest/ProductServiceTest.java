@@ -290,7 +290,7 @@ public class ProductServiceTest {
         when(productRepository.save(nullIdProduct)).thenReturn(product);
         when(productMapper.toProductDTO(product)).thenReturn(productDTO);
 
-        CreateProductDTO result = productService.createProductDto(inputDTO);
+        CreateProductDTO result = productService.createProductDto(inputDTO, );
 
         assertNotNull(result);
         assertEquals(1L, result.idProduct());
@@ -311,7 +311,7 @@ public class ProductServiceTest {
                 .when(productValidations).validateProductNameExists(product);
 
         assertThrows(DuplicateEntityException.class,
-                () -> productService.createProductDto(productDTO));
+                () -> productService.createProductDto(productDTO, ));
 
         verify(productValidations).validateProductNameExists(product);
         verify(productRepository, never()).save(any());

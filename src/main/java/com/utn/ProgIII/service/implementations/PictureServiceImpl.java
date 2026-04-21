@@ -1,5 +1,6 @@
 package com.utn.ProgIII.service.implementations;
 
+import com.utn.ProgIII.exceptions.InternalServerError;
 import com.utn.ProgIII.service.interfaces.PictureService;
 
 import org.springframework.stereotype.Service;
@@ -13,27 +14,40 @@ import java.nio.file.Paths;
 public class PictureServiceImpl implements PictureService {
 
     @Override
-    public String uploadPicture(String path, MultipartFile file) throws IOException {
+    public String uploadPicture(String path, MultipartFile file) {
 
         String filename = file.getOriginalFilename();
 
         String filepath = path + File.separator + filename;
 
-        File f = new File(filepath);
-
+        System.out.println(filepath);
+        File f = new File(path);
         if (!f.exists())
         {
-            f.mkdir();
+            boolean created = f.mkdirs();
         }
 
-        Files.copy(file.getInputStream(), Paths.get(filepath));
+        try {
+            Files.copy(file.getInputStream(), Paths.get(filepath));
+        } catch (IOException e) {
+            throw new InternalServerError("Error cargando archivo!");
+        }
 
         return filename;
     }
 
     @Override
-    public InputStream getResourceFile(String path, String filename) throws FileNotFoundException {
+    public InputStream getResourceFile(String path, String filename) {
         String fullpath = path + File.separator + filename;
-        return new FileInputStream(fullpath);
+
+        InputStream file;
+        try {
+            file = new FileInputStream(fullpath);
+        } catch (FileNotFoundException e)
+        {
+            file = null;
+        }
+
+        return file;
     }
 }

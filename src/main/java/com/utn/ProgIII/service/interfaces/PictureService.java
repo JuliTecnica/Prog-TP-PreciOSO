@@ -7,6 +7,6 @@ import java.io.IOException;
 import java.io.InputStream;
 
 public interface PictureService {
-    String uploadPicture(String path, MultipartFile filename) throws IOException;
-    InputStream getResourceFile(String path, String filename) throws FileNotFoundException;
+    String uploadPicture(String path, MultipartFile file);
+    InputStream getResourceFile(String path, String filename);
 }

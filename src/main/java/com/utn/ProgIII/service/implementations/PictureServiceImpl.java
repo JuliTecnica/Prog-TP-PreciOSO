@@ -72,4 +72,14 @@ public class PictureServiceImpl implements PictureService {
 
         return file;
     }
+
+    @Override
+    public boolean deleteFile(String path, String filename)
+    {
+        String fullpath = path + File.separator + filename;
+
+        File file = new File(fullpath);
+
+        return file.delete();
+    }
 }

@@ -122,7 +122,7 @@ public class ProductServiceImpl implements ProductService {
 
         productValidations.validateProductNameExists(product);
 
-        if(!image.isEmpty())
+        if(image != null && !image.isEmpty())
         {
             String file_name = pictureService.uploadPicture(image_product_path,image);
             product.setImage_url(file_name);
@@ -138,12 +138,13 @@ public class ProductServiceImpl implements ProductService {
      *
      * @param id         ID del producto que se modificará
      * @param productDto Los datos para modificar el producto
+     * @param image
      * @return Un ProductDTO del producto modificado
      * @see CreateProductDTO
      */
     @Override
     @Transactional
-    public ProductDTO updateProduct(Long id, CreateProductDTO productDto) {
+    public ProductDTO updateProduct(Long id, CreateProductDTO productDto, MultipartFile image) {
 
         if(!EnumUtils.isValidEnum(ProductStatus.class,productDto.status()))
         {
@@ -165,6 +166,13 @@ public class ProductServiceImpl implements ProductService {
 
         product.setProfitMargin(productDto.profitMargin());
         product.setStock(productDto.stock());
+
+        if(image != null && !image.isEmpty())
+        {
+            pictureService.deleteFile(image_product_path,product.getImage_url());
+            String new_picture = pictureService.uploadPicture(image_product_path,image);
+            product.setImage_url(new_picture);
+        }
 
         product = productRepository.save(product);
         return productMapper.toProductDTO(product);

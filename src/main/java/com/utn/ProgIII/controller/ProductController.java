@@ -56,11 +56,6 @@ public class ProductController {
             schema = @Schema(implementation = ProblemDetail.class)
     ))
     public ResponseEntity<ProductDTO> addProduct (
-            /*
-            @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "El producto para crear")
-            @RequestPart CreateProductDTO productDTO,
-            @RequestPart MultipartFile image
-            */
             @RequestPart(required = false) MultipartFile file,
             @RequestPart String productData
             ){
@@ -71,7 +66,7 @@ public class ProductController {
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
-    public CreateProductDTO transformDataToCreateProductDTO(String productDto)
+    private CreateProductDTO transformDataToCreateProductDTO(String productDto)
     {
         ObjectMapper objectMapper = new ObjectMapper();
 
@@ -165,9 +160,13 @@ public class ProductController {
             schema = @Schema(implementation = ProblemDetail.class)
     ))
 
-    public ProductDTO update (@PathVariable @Parameter(description = "El ID de un producto", example = "1") Long id, @RequestBody CreateProductDTO modifyProductDTO){
-
-       return productService.updateProduct(id,modifyProductDTO);
+    public ProductDTO update (
+            @PathVariable @Parameter(description = "El ID de un producto", example = "1") Long id,
+            @RequestPart(required = false) MultipartFile file,
+            @RequestPart String productData)
+    {
+        CreateProductDTO productDTO = transformDataToCreateProductDTO(productData);
+        return productService.updateProduct(id,productDTO, file);
     }
 
     //Baja lógica de un producto (modifica solo el estado)

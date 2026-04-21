@@ -9,6 +9,7 @@ import com.utn.ProgIII.model.Product.Product;
 import com.utn.ProgIII.model.Product.ProductStatus;
 import org.apache.commons.lang3.EnumUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -20,6 +21,8 @@ public class ProductMapper {
     @Autowired
     private CategoryMapper categoryMapper;
 
+    @Value("${app.serverAddress}")
+    private String address;
     /**
      * Se encarga de convertir un objeto a un dto
      * @param product El objeto
@@ -33,7 +36,7 @@ public class ProductMapper {
         Integer stock = product.getStock();
         CategoryDTO category = categoryMapper.toDTO(product.getCategory());
         Double price = calculateClientPrice(product.getPrice(),profitMargin);
-        String image_url = product.getImage_url();
+        String image_url = createImageURL(product.getImage_url());
 
         return new ProductDTO(idProduct,name,status, profitMargin * 100, stock,price,category,image_url);
     }
@@ -70,13 +73,20 @@ public class ProductMapper {
         Integer stock = product.getStock();
         CategoryDTO category = categoryMapper.toDTO(product.getCategory());
         Double price = calculateClientPrice(product.getPrice(),profitMargin);
+        String image_url = createImageURL(product.getImage_url());
 
-        return new ViewProductCustomer(idProduct,name,stock,price,category);
+        return new ViewProductCustomer(idProduct,name,stock,price,category,image_url);
     }
 
-    public Double calculateClientPrice(Double cost, Double profit_margin)
+    private Double calculateClientPrice(Double cost, Double profit_margin)
     {
         if(cost == null) return null;
         return cost + (profit_margin * cost);
+    }
+
+    private String createImageURL(String url)
+    {
+        if(url == null) return null;
+        return address + "misc/image/" + url;
     }
 }

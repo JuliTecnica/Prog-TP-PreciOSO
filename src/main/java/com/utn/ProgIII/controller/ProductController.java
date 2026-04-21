@@ -61,7 +61,7 @@ public class ProductController {
             @RequestPart CreateProductDTO productDTO,
             @RequestPart MultipartFile image
             */
-            @RequestPart MultipartFile file,
+            @RequestPart(required = false) MultipartFile file,
             @RequestPart String productData
             ){
 

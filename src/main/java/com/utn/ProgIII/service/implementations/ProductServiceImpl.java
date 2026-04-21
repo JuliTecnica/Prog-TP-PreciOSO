@@ -122,8 +122,11 @@ public class ProductServiceImpl implements ProductService {
 
         productValidations.validateProductNameExists(product);
 
-        String file_name = pictureService.uploadPicture(image_product_path,image);
-        product.setImage_url(file_name);
+        if(!image.isEmpty())
+        {
+            String file_name = pictureService.uploadPicture(image_product_path,image);
+            product.setImage_url(file_name);
+        }
 
         product = productRepository.save(product);
 

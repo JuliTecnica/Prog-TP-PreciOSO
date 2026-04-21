@@ -4,6 +4,7 @@ import com.querydsl.core.BooleanBuilder;
 import com.utn.ProgIII.dto.CreateProductDTO;
 
 import com.utn.ProgIII.dto.ProductDTO;
+import com.utn.ProgIII.dto.ViewProductCustomer;
 import com.utn.ProgIII.exceptions.*;
 import com.utn.ProgIII.mapper.ProductMapper;
 import com.utn.ProgIII.model.Product.Category;
@@ -196,6 +197,34 @@ public class ProductServiceImpl implements ProductService {
         }
 
         return productRepository.findAll(builder,pageable).map(productMapper::toProductDTO);
+    }
+
+    @Override
+    public Page<ViewProductCustomer> getProductsOnSale(Pageable pageable, String name, List<Long> categories, boolean include_oos) {
+        QProduct qProduct = QProduct.product;
+        BooleanBuilder booleanBuilder = new BooleanBuilder().or(qProduct.isNotNull());
+
+        booleanBuilder.and(qProduct.status.eq(ProductStatus.ENABLED));
+        booleanBuilder.and(qProduct.price.isNotNull());
+
+        if(name != null)
+        {
+            booleanBuilder.and(qProduct.name.likeIgnoreCase('%' + name + '%'));
+        }
+
+        if(categories != null && !categories.isEmpty())
+        {
+            booleanBuilder.and(qProduct.category.idCategory.in(categories));
+        }
+
+        if(include_oos)
+        {
+            booleanBuilder.and(qProduct.stock.goe(0));
+        } else {
+            booleanBuilder.and(qProduct.stock.goe(1));
+        }
+
+        return productRepository.findAll(booleanBuilder, pageable).map(productMapper::toViewCustomerDTO);
     }
 
     /**

@@ -43,6 +43,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/products/**").hasRole("MANAGER")
                         .requestMatchers(HttpMethod.PUT, "/products/**").hasRole("MANAGER")
                         .requestMatchers(HttpMethod.DELETE, "/products/**").hasRole("MANAGER")
+                        .requestMatchers(HttpMethod.GET, "/products/on-sale").hasRole("CUSTOMER") // order is important
                         .requestMatchers(HttpMethod.GET, "/products/**").hasRole("EMPLOYEE")
 
                         .requestMatchers(HttpMethod.POST, "/productSupplier/**").hasRole("MANAGER")

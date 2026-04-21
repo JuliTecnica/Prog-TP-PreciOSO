@@ -15,6 +15,7 @@ import com.utn.ProgIII.repository.CategoryRepository;
 import com.utn.ProgIII.repository.ProductRepository;
 import com.utn.ProgIII.repository.ProductSupplierRepository;
 import com.utn.ProgIII.service.interfaces.AuthService;
+import com.utn.ProgIII.service.interfaces.PictureService;
 import com.utn.ProgIII.service.interfaces.ProductService;
 import jakarta.transaction.Transactional;
 import com.utn.ProgIII.validations.ProductValidations;
@@ -36,7 +37,13 @@ public class ProductServiceImpl implements ProductService {
     private final ProductValidations productValidations;
     private final AuthService authService;
 
-    public ProductServiceImpl(ProductRepository productRepository, ProductMapper productMapper, ProductSupplierRepository productSupplierRepository, CategoryRepository categoryRepository,ProductValidations productValidations, AuthService authService) {
+    private final PictureService pictureService;
+
+
+    // def can be changed, but this should do
+    final private String image_product_path = "/images/products";
+
+    public ProductServiceImpl(ProductRepository productRepository, ProductMapper productMapper, ProductSupplierRepository productSupplierRepository, CategoryRepository categoryRepository,ProductValidations productValidations, AuthService authService, PictureService pictureService) {
 
         this.productRepository = productRepository;
         this.productMapper = productMapper;
@@ -44,6 +51,7 @@ public class ProductServiceImpl implements ProductService {
         this.categoryRepository = categoryRepository;
         this.productValidations = productValidations;
         this.authService = authService;
+        this.pictureService = pictureService;
     }
 
 

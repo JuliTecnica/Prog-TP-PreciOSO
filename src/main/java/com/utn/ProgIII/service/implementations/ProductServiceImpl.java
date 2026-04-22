@@ -15,13 +15,16 @@ import com.utn.ProgIII.repository.CategoryRepository;
 import com.utn.ProgIII.repository.ProductRepository;
 import com.utn.ProgIII.repository.ProductSupplierRepository;
 import com.utn.ProgIII.service.interfaces.AuthService;
+import com.utn.ProgIII.service.interfaces.PictureService;
 import com.utn.ProgIII.service.interfaces.ProductService;
 import jakarta.transaction.Transactional;
 import com.utn.ProgIII.validations.ProductValidations;
 import org.apache.commons.lang3.EnumUtils;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -36,7 +39,14 @@ public class ProductServiceImpl implements ProductService {
     private final ProductValidations productValidations;
     private final AuthService authService;
 
-    public ProductServiceImpl(ProductRepository productRepository, ProductMapper productMapper, ProductSupplierRepository productSupplierRepository, CategoryRepository categoryRepository,ProductValidations productValidations, AuthService authService) {
+    private final PictureService pictureService;
+
+
+    // def can be changed, but this should do
+    @Value("${app.imagesFolder}")
+    private String image_product_path;
+
+    public ProductServiceImpl(ProductRepository productRepository, ProductMapper productMapper, ProductSupplierRepository productSupplierRepository, CategoryRepository categoryRepository, ProductValidations productValidations, AuthService authService, PictureService pictureService) {
 
         this.productRepository = productRepository;
         this.productMapper = productMapper;
@@ -44,6 +54,7 @@ public class ProductServiceImpl implements ProductService {
         this.categoryRepository = categoryRepository;
         this.productValidations = productValidations;
         this.authService = authService;
+        this.pictureService = pictureService;
     }
 
 
@@ -97,18 +108,26 @@ public class ProductServiceImpl implements ProductService {
      * Crea un producto nuevo y lo guarda en la base de datos
      *
      * @param productDto Un DTO de un producto que se creará
+     * @param image
      * @return Un <code>ProductDto</code> del producto creado
      * @see CreateProductDTO
      */
 
     @Override
-    public ProductDTO createProductDto(CreateProductDTO productDto) {
+    public ProductDTO createProductDto(CreateProductDTO productDto, MultipartFile image) {
 
         Product product = productMapper.toEntity(productDto);
         Category category = categoryRepository.findById(productDto.idCategory()).orElseThrow(() -> new NotFoundException("Esa categoria no existe!"));
         product.setCategory(category);
 
         productValidations.validateProductNameExists(product);
+
+        if(image != null && !image.isEmpty())
+        {
+            String file_name = pictureService.uploadPicture(image_product_path,image);
+            product.setImage_url(file_name);
+        }
+
         product = productRepository.save(product);
 
         return productMapper.toProductDTO(product);
@@ -119,12 +138,13 @@ public class ProductServiceImpl implements ProductService {
      *
      * @param id         ID del producto que se modificará
      * @param productDto Los datos para modificar el producto
+     * @param image
      * @return Un ProductDTO del producto modificado
      * @see CreateProductDTO
      */
     @Override
     @Transactional
-    public ProductDTO updateProduct(Long id, CreateProductDTO productDto) {
+    public ProductDTO updateProduct(Long id, CreateProductDTO productDto, MultipartFile image) {
 
         if(!EnumUtils.isValidEnum(ProductStatus.class,productDto.status()))
         {
@@ -146,6 +166,13 @@ public class ProductServiceImpl implements ProductService {
 
         product.setProfitMargin(productDto.profitMargin());
         product.setStock(productDto.stock());
+
+        if(image != null && !image.isEmpty())
+        {
+            pictureService.deleteFile(image_product_path,product.getImage_url());
+            String new_picture = pictureService.uploadPicture(image_product_path,image);
+            product.setImage_url(new_picture);
+        }
 
         product = productRepository.save(product);
         return productMapper.toProductDTO(product);

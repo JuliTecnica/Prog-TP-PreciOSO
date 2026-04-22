@@ -8,7 +8,6 @@ import com.utn.ProgIII.model.Address.Address;
 import com.utn.ProgIII.model.Supplier.QSupplier;
 import com.utn.ProgIII.model.Supplier.Supplier;
 import com.utn.ProgIII.dto.ViewSupplierDTO;
-import com.utn.ProgIII.model.User.QUser;
 import com.utn.ProgIII.repository.SupplierRepository;
 import com.utn.ProgIII.service.interfaces.SupplierService;
 import com.utn.ProgIII.validations.SupplierValidations;
@@ -77,7 +76,6 @@ public class SupplierServiceImpl implements SupplierService {
     /**
      * Elimina un proveedor en caso de que exista
      * @param id El ID del proveedor
-     * @return un booleano representando el éxito.
      */
     @Override
     public void deleteSupplier(long id) {

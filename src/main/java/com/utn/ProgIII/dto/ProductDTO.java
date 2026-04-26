@@ -17,5 +17,7 @@ public record ProductDTO(
         @Schema(example = "200")
         Double price,
         @Schema(example = "1")
-        CategoryDTO category) {
+        CategoryDTO category,
+        String image_url
+) {
 }

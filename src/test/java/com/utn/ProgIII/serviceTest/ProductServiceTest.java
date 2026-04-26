@@ -290,7 +290,7 @@ public class ProductServiceTest {
         when(productRepository.save(nullIdProduct)).thenReturn(product);
         when(productMapper.toProductDTO(product)).thenReturn(productDTO);
 
-        CreateProductDTO result = productService.createProductDto(inputDTO);
+        CreateProductDTO result = productService.createProductDto(inputDTO, );
 
         assertNotNull(result);
         assertEquals(1L, result.idProduct());
@@ -311,7 +311,7 @@ public class ProductServiceTest {
                 .when(productValidations).validateProductNameExists(product);
 
         assertThrows(DuplicateEntityException.class,
-                () -> productService.createProductDto(productDTO));
+                () -> productService.createProductDto(productDTO, ));
 
         verify(productValidations).validateProductNameExists(product);
         verify(productRepository, never()).save(any());
@@ -333,7 +333,7 @@ public class ProductServiceTest {
 
         when(productMapper.toProductDTO(any(Product.class))).thenReturn(updateDto);
 
-        CreateProductDTO result = productService.updateProduct(PRODUCT_ID, updateDto);
+        CreateProductDTO result = productService.updateProduct(PRODUCT_ID, updateDto, );
 
         assertEquals("product Two", result.name());
         assertEquals("ENABLED", result.status());
@@ -355,7 +355,7 @@ public class ProductServiceTest {
         CreateProductDTO invalidDTO = new CreateProductDTO(PRODUCT_ID, PRODUCT_NAME, INVALID_STATUS);
 
         InvalidRequestException exception = assertThrows(InvalidRequestException.class,
-                () -> productService.updateProduct(PRODUCT_ID, invalidDTO));
+                () -> productService.updateProduct(PRODUCT_ID, invalidDTO, ));
 
         assertEquals("El estado de producto ingresado no es válido", exception.getMessage());
         verify(productRepository, never()).save(any());

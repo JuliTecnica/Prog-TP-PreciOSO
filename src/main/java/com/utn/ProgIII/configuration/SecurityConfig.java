@@ -61,8 +61,8 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/categories/**").hasRole("CUSTOMER")
 
                         .requestMatchers(HttpMethod.GET, "/misc/dollar").hasRole("MANAGER")
-
                         .requestMatchers(HttpMethod.GET, "/enums/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/misc/**").permitAll()
 
                         .requestMatchers(HttpMethod.GET,"/docs/**","/swagger-ui/**", "/swagger-resources/*", "/v3/api-docs/**").permitAll()
                         .anyRequest().authenticated()

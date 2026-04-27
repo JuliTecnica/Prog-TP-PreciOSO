@@ -12,7 +12,6 @@ import com.utn.ProgIII.model.Supplier.Supplier;
 import com.utn.ProgIII.repository.ProductRepository;
 import com.utn.ProgIII.repository.ProductSupplierRepository;
 import com.utn.ProgIII.repository.SupplierRepository;
-import com.utn.ProgIII.service.interfaces.AuthService;
 import com.utn.ProgIII.service.interfaces.MiscService;
 import com.utn.ProgIII.service.interfaces.ProductSupplierService;
 import com.utn.ProgIII.validations.ProductSupplierValidations;
@@ -20,7 +19,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 @Service
@@ -273,5 +274,37 @@ public class ProductSupplierServiceImpl implements ProductSupplierService {
         this.productSupplierValidations.productSupplierIdExist(id);
 
         return this.mapper.fromEntityToDto(this.productSupplierRepository.getReferenceById(id)) ;
+    }
+
+
+    @Override
+    public List<ProductSupplier> returnAllRelationshipsOfSupplier(Long idSupplier) {
+        return productSupplierRepository.findBySupplierIdSupplier(idSupplier);
+    }
+
+    @Override
+    public void handlePostSupplierDelete(List<ProductSupplier> productSupplierRels) {
+        List<Product> change_queue = new ArrayList<>();
+        System.out.println(productSupplierRels);
+
+        for(ProductSupplier productSupplier : productSupplierRels)
+        {
+            Product product = productSupplier.getProduct();
+            Optional<Double> optionalDouble = productSupplierRepository.findTopCostInProduct(product.getIdProduct());
+            if(optionalDouble.isEmpty())
+            {
+                product.setPrice(null);
+                change_queue.add(product);
+            } else if (optionalDouble.get() <= product.getPrice())
+            {
+                product.setPrice(optionalDouble.get());
+                change_queue.add(product);
+            }
+        }
+
+        for (Product product : change_queue)
+        {
+            productRepository.save(product);
+        }
     }
 }

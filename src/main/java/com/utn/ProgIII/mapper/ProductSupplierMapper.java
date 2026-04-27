@@ -70,7 +70,7 @@ public class ProductSupplierMapper {
     public Double shortenDouble(Double number)
     {
         String s = String.format("%.5f", number);
-        return Double.parseDouble(s);
+        return Double.parseDouble(s.replace(",", "."));
     }
 }
 

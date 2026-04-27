@@ -25,4 +25,6 @@ public interface ProductSupplierRepository extends JpaRepository<ProductSupplier
 
     @NativeQuery("SELECT max(ps.cost) FROM product_supplier ps WHERE id_product = :idProduct")
     Optional<Double> findTopCostInProduct(@Param("idProduct") Long idProduct);
+
+    List<ProductSupplier> findBySupplierIdSupplier(Long idSupplier);
 }

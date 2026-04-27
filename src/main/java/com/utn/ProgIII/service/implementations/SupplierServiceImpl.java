@@ -5,10 +5,12 @@ import com.utn.ProgIII.dto.AddSupplierDTO;
 import com.utn.ProgIII.exceptions.SupplierNotFoundException;
 import com.utn.ProgIII.mapper.SupplierMapper;
 import com.utn.ProgIII.model.Address.Address;
+import com.utn.ProgIII.model.ProductSupplier.ProductSupplier;
 import com.utn.ProgIII.model.Supplier.QSupplier;
 import com.utn.ProgIII.model.Supplier.Supplier;
 import com.utn.ProgIII.dto.ViewSupplierDTO;
 import com.utn.ProgIII.repository.SupplierRepository;
+import com.utn.ProgIII.service.interfaces.ProductSupplierService;
 import com.utn.ProgIII.service.interfaces.SupplierService;
 import com.utn.ProgIII.validations.SupplierValidations;
 import jakarta.transaction.Transactional;
@@ -24,11 +26,13 @@ public class SupplierServiceImpl implements SupplierService {
     private final SupplierRepository supplierRepository;
     private final SupplierValidations supplierValidations;
     private final SupplierMapper suppliermapper;
+    private final ProductSupplierService productSupplierService;
 
-    public SupplierServiceImpl(SupplierRepository supplierRepository, SupplierValidations supplierValidations, SupplierMapper suppliermapper) {
+    public SupplierServiceImpl(SupplierRepository supplierRepository, SupplierValidations supplierValidations, SupplierMapper suppliermapper, ProductSupplierService productSupplierService) {
         this.supplierRepository = supplierRepository;
         this.supplierValidations = supplierValidations;
         this.suppliermapper = suppliermapper;
+        this.productSupplierService = productSupplierService;
     }
 
     /**
@@ -81,7 +85,9 @@ public class SupplierServiceImpl implements SupplierService {
     public void deleteSupplier(long id) {
         if(supplierRepository.existsById(id))
         {
+            List<ProductSupplier> rels = productSupplierService.returnAllRelationshipsOfSupplier(id);
             supplierRepository.deleteById(id);
+            productSupplierService.handlePostSupplierDelete(rels);
         } else {
             throw new SupplierNotFoundException("Ese proveedor no existe");
         }

@@ -181,19 +181,4 @@ public class ProductController {
         productService.deleteProduct(id);
         return ResponseEntity.noContent().build();
     }
-
-    @GetMapping("/on-sale")
-    @ApiResponse(responseCode = "200", description = "Datos encontrados", content = @Content(
-            mediaType = "application/json",
-            array = @ArraySchema(schema = @Schema(implementation = ProductDTO.class))
-    ))
-    public ResponseEntity<Page<ViewProductCustomer>> getProductsOnSale(
-            @ParameterObject @PageableDefault(size = 5) Pageable paginacion,
-            @RequestParam(required = false) String name,
-            @RequestParam(required = false) List<Long> category,
-            @RequestParam(required = false) boolean include_oos
-    )
-    {
-        return ResponseEntity.ok(productService.getProductsOnSale(paginacion, name, category, include_oos));
-    }
 }

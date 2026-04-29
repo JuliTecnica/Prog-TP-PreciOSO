@@ -14,6 +14,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 @Service
@@ -66,4 +68,26 @@ public class CustomerServiceImpl implements CustomerService {
 
         return productRepository.findAll(booleanBuilder, pageable).map(productMapper::toViewCustomerDTO);
     }
+
+    @Override
+    public List<ViewProductCustomer> getProductsOnCart(List<Long> products) {
+        QProduct qProduct = QProduct.product;
+        BooleanBuilder builder = new BooleanBuilder().or(qProduct.isNotNull());
+
+        builder.and(qProduct.status.eq(ProductStatus.ENABLED));
+        builder.and(qProduct.price.isNotNull());
+
+        if(products != null && !products.isEmpty())
+        {
+            builder.and(qProduct.idProduct.in(products));
+        }
+
+        List<Product> actualList = new ArrayList<Product>();
+        Iterator<Product> result = productRepository.findAll(builder).iterator();
+        result.forEachRemaining(actualList::add);
+
+        return actualList.stream().map(productMapper::toViewCustomerDTO).toList();
+
+    }
+
 }

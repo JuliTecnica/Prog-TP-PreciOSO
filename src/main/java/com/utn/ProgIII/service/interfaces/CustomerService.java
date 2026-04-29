@@ -9,4 +9,5 @@ import java.util.List;
 public interface CustomerService {
     ViewProductCustomer getProductOnSale(Long id);
     Page<ViewProductCustomer> getProductsOnSale(Pageable pageable, String name, List<Long> categories, boolean include_oos);
+    List<ViewProductCustomer> getProductsOnCart(List<Long> products);
 }

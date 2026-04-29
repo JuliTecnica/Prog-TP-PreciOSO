@@ -55,4 +55,16 @@ public class CustomerControler {
     ){
         return ResponseEntity.ok(customerService.getProductOnSale(id));
     }
+
+    @GetMapping("/products/{productIds}")
+    @ApiResponse(responseCode = "200", description = "Datos encontrados", content = @Content(
+            mediaType = "application/json",
+            array = @ArraySchema(schema = @Schema(implementation = ProductDTO.class))
+    ))
+    public ResponseEntity<List<ViewProductCustomer>> getProductsOnSaleByPage(
+            @PathVariable List<Long> productIds
+    )
+    {
+        return ResponseEntity.ok(customerService.getProductsOnCart(productIds));
+    }
 }

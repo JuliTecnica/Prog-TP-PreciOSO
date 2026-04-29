@@ -207,7 +207,7 @@ public class UserServiceImpl implements UserService {
      *
      * @param status El estado de los usuarios que se desea ver
      * @param role   El rol de los usuarios que se desea ver
-     * @param dni
+     * @param dni El DNI de la persona
      * @return Una lista con los DTO de cada usuario existente en el sistema
      * @throws InvalidRequestException Si alguno de los parámetros tiene valores erróneos
      *                                 <p>

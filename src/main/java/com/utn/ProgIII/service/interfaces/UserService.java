@@ -16,5 +16,5 @@ public interface UserService {
     UserWithCredentialDTO updateUser(Long id, CreateUserDTO dto);
     void deleteOrRemoveUser(Long id, String method);
 
-    Page<UserWithCredentialDTO> getUsersPage(Pageable pageable, String status, String role);
+    Page<UserWithCredentialDTO> getUsersPage(Pageable pageable, String status, String role, String dni);
 }

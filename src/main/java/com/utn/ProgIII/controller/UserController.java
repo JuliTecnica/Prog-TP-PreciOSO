@@ -185,8 +185,9 @@ public class UserController {
     @GetMapping("/page")
     public ResponseEntity<Page<UserWithCredentialDTO>> getAllUsersUsingDsl(@RequestParam(required = false) String role,
                                                                            @RequestParam(required = false) String status,
+                                                                           @RequestParam(required = false) String dni,
                                                                            @ParameterObject @PageableDefault(size = 10) Pageable paginacion)
     {
-        return ResponseEntity.ok(userService.getUsersPage(paginacion,status,role));
+        return ResponseEntity.ok(userService.getUsersPage(paginacion,status,role,dni));
     }
 }

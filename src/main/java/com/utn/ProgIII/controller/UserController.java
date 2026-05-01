@@ -1,7 +1,9 @@
 package com.utn.ProgIII.controller;
 
 import com.utn.ProgIII.dto.CreateUserDTO;
-import com.utn.ProgIII.dto.CreateUserNoAuthDTO;import com.utn.ProgIII.dto.UserWithCredentialDTO;
+import com.utn.ProgIII.dto.CreateUserNoAuthDTO;
+import com.utn.ProgIII.dto.StateChangeDTO;
+import com.utn.ProgIII.dto.UserWithCredentialDTO;
 import com.utn.ProgIII.service.interfaces.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -157,6 +159,16 @@ public class UserController {
             @RequestParam(defaultValue = "soft") @Parameter(description = "soft = baja lógica<br>hard = baja física") String deletionType) {
 
         userService.deleteOrRemoveUser(id, deletionType);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PatchMapping("/{id}")
+    public ResponseEntity<?> toggleState(
+            @PathVariable Long id,
+            @RequestBody StateChangeDTO status
+    )
+    {
+        userService.toggleUserStatus(id,status);
         return ResponseEntity.noContent().build();
     }
 

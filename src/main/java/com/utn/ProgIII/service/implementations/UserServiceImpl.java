@@ -182,6 +182,21 @@ public class UserServiceImpl implements UserService {
 
     }
 
+    @Override
+    public void toggleUserStatus(Long id, StateChangeDTO dto) {
+        User user = userRepository.findById(id).orElseThrow(() -> new UserNotFoundException("Usuario no encontrado"));
+
+
+        if(dto.status() != null && !EnumUtils.isValidEnum(UserStatus.class, dto.status().toUpperCase()))
+        {
+            throw new InvalidRequestException("Ese estado no está presente");
+        }
+
+        UserStatus enum_status = UserStatus.valueOf(dto.status().toUpperCase());
+        user.setStatus(enum_status);
+        userRepository.save(user);
+    }
+
     /**
      * Hace baja lógica del sistema al usuario con el ID solicitado por parámetro
      * @param user El usuario que se le dará baja temporal

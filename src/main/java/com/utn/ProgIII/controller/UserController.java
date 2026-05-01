@@ -1,7 +1,9 @@
 package com.utn.ProgIII.controller;
 
 import com.utn.ProgIII.dto.CreateUserDTO;
-import com.utn.ProgIII.dto.CreateUserNoAuthDTO;import com.utn.ProgIII.dto.UserWithCredentialDTO;
+import com.utn.ProgIII.dto.CreateUserNoAuthDTO;
+import com.utn.ProgIII.dto.StateChangeDTO;
+import com.utn.ProgIII.dto.UserWithCredentialDTO;
 import com.utn.ProgIII.service.interfaces.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -160,6 +162,16 @@ public class UserController {
         return ResponseEntity.noContent().build();
     }
 
+    @PatchMapping("/{id}")
+    public ResponseEntity<?> toggleState(
+            @PathVariable Long id,
+            @RequestBody StateChangeDTO status
+    )
+    {
+        userService.toggleUserStatus(id,status);
+        return ResponseEntity.noContent().build();
+    }
+
 
     /**
      * Una página que contiene los datos de usuarios.
@@ -185,8 +197,9 @@ public class UserController {
     @GetMapping("/page")
     public ResponseEntity<Page<UserWithCredentialDTO>> getAllUsersUsingDsl(@RequestParam(required = false) String role,
                                                                            @RequestParam(required = false) String status,
+                                                                           @RequestParam(required = false) String dni,
                                                                            @ParameterObject @PageableDefault(size = 10) Pageable paginacion)
     {
-        return ResponseEntity.ok(userService.getUsersPage(paginacion,status,role));
+        return ResponseEntity.ok(userService.getUsersPage(paginacion,status,role,dni));
     }
 }

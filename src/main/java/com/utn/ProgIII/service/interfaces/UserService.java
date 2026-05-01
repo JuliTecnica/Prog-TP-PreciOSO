@@ -2,6 +2,7 @@ package com.utn.ProgIII.service.interfaces;
 
 import com.utn.ProgIII.dto.CreateUserDTO;
 import com.utn.ProgIII.dto.CreateUserNoAuthDTO;
+import com.utn.ProgIII.dto.StateChangeDTO;
 import com.utn.ProgIII.dto.UserWithCredentialDTO;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -15,6 +16,7 @@ public interface UserService {
     UserWithCredentialDTO getUserById(Long id);
     UserWithCredentialDTO updateUser(Long id, CreateUserDTO dto);
     void deleteOrRemoveUser(Long id, String method);
+    void toggleUserStatus(Long id, StateChangeDTO dto);
 
-    Page<UserWithCredentialDTO> getUsersPage(Pageable pageable, String status, String role);
+    Page<UserWithCredentialDTO> getUsersPage(Pageable pageable, String status, String role, String dni);
 }

@@ -182,6 +182,21 @@ public class UserServiceImpl implements UserService {
 
     }
 
+    @Override
+    public void toggleUserStatus(Long id, StateChangeDTO dto) {
+        User user = userRepository.findById(id).orElseThrow(() -> new UserNotFoundException("Usuario no encontrado"));
+
+
+        if(dto.status() != null && !EnumUtils.isValidEnum(UserStatus.class, dto.status().toUpperCase()))
+        {
+            throw new InvalidRequestException("Ese estado no está presente");
+        }
+
+        UserStatus enum_status = UserStatus.valueOf(dto.status().toUpperCase());
+        user.setStatus(enum_status);
+        userRepository.save(user);
+    }
+
     /**
      * Hace baja lógica del sistema al usuario con el ID solicitado por parámetro
      * @param user El usuario que se le dará baja temporal
@@ -204,14 +219,16 @@ public class UserServiceImpl implements UserService {
 
     /**
      * Muestra los datos de todos los usuarios presentes en el sistema, según el rol o estado
-     * @param role El rol de los usuarios que se desea ver
+     *
      * @param status El estado de los usuarios que se desea ver
+     * @param role   El rol de los usuarios que se desea ver
+     * @param dni El DNI de la persona
      * @return Una lista con los DTO de cada usuario existente en el sistema
      * @throws InvalidRequestException Si alguno de los parámetros tiene valores erróneos
-     * <p>
+     *                                 <p>
      */
     @Override
-    public Page<UserWithCredentialDTO> getUsersPage(Pageable pageable, String status, String role)
+    public Page<UserWithCredentialDTO> getUsersPage(Pageable pageable, String status, String role, String dni)
     {
         QUser user = QUser.user;
         BooleanBuilder builder = new BooleanBuilder().or(user.isNotNull());
@@ -235,6 +252,11 @@ public class UserServiceImpl implements UserService {
         if (role != null) {
             Role enum_role = Role.valueOf(role.toUpperCase());
             builder.and(user.credential.role.eq(enum_role));
+        }
+
+        // Add DNI filter if provided
+        if (dni != null) {
+            builder.and(user.dni.eq(dni));
         }
 
         return userRepository.findAll(builder, pageable).map(userMapper::toUserWithCredentialDTO);

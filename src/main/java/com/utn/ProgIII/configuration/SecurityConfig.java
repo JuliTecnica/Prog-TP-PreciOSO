@@ -60,6 +60,8 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.PUT, "/categories/**").hasRole("MANAGER")
                         .requestMatchers(HttpMethod.GET, "/categories/**").hasRole("CUSTOMER")
 
+                        .requestMatchers(HttpMethod.GET, "/sales/**").hasRole("CUSTOMER")
+
                         .requestMatchers(HttpMethod.GET, "/misc/dollar").hasRole("MANAGER")
                         .requestMatchers(HttpMethod.GET, "/enums/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/misc/**").permitAll()

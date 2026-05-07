@@ -20,7 +20,7 @@ CREATE TABLE `order_item` (
     `product_id` BIGINT NOT NULL,
     `order_id` BIGINT NOT NULL ,
     `unit_price` DECIMAL(10,2) NOT NULL ,
-    `quantity` FLOAT NOT NULL,
+    `quantity` DOUBLE NOT NULL,
     CONSTRAINT FK_order_item_product FOREIGN KEY order_item(product_id) REFERENCES product(id_product),
     CONSTRAINT FK_order_item_order FOREIGN KEY order_item(order_id) REFERENCES order_details(order_details_id)
 );

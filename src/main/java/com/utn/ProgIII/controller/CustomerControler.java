@@ -1,8 +1,11 @@
 package com.utn.ProgIII.controller;
 
+import com.utn.ProgIII.dto.CreateOrderDTO;
+import com.utn.ProgIII.dto.CreatedOrderDTO;
 import com.utn.ProgIII.dto.ProductDTO;
 import com.utn.ProgIII.dto.ViewProductCustomer;
 import com.utn.ProgIII.service.interfaces.CustomerService;
+import com.utn.ProgIII.service.interfaces.OrderService;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -24,6 +27,8 @@ public class CustomerControler {
 
     @Autowired
     private CustomerService customerService;
+    @Autowired
+    private OrderService orderService;
 
     @GetMapping("/on-sale")
     @ApiResponse(responseCode = "200", description = "Datos encontrados", content = @Content(
@@ -66,5 +71,18 @@ public class CustomerControler {
     )
     {
         return ResponseEntity.ok(customerService.getProductsOnCart(productIds));
+    }
+
+
+    @PostMapping("/create-order")
+    @ApiResponse(responseCode = "201", description = "Orden creada", content = @Content(
+            mediaType = "application/json",
+            schema = @Schema(implementation = CreateOrderDTO.class)
+    ))
+    public ResponseEntity<CreatedOrderDTO> createOrder(
+            @RequestBody CreateOrderDTO dto
+            )
+    {
+        return ResponseEntity.status(201).body(orderService.createOrder(dto));
     }
 }

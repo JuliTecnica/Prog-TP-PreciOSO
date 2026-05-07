@@ -4,6 +4,7 @@ import com.querydsl.core.BooleanBuilder;
 import com.utn.ProgIII.dto.*;
 import com.utn.ProgIII.exceptions.*;
 import com.utn.ProgIII.mapper.UserMapper;
+import com.utn.ProgIII.model.Credential.Credential;
 import com.utn.ProgIII.model.Credential.Role;
 import com.utn.ProgIII.model.User.QUser;
 import com.utn.ProgIII.model.User.User;
@@ -17,8 +18,12 @@ import jakarta.transaction.Transactional;
 import org.apache.commons.lang3.EnumUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.util.Optional;
 
 /**
  * Clase que se encarga de la lógica entre el repositorio y el mapper
@@ -260,5 +265,25 @@ public class UserServiceImpl implements UserService {
         }
 
         return userRepository.findAll(builder, pageable).map(userMapper::toUserWithCredentialDTO);
+    }
+
+    public User getCurrentUser() {
+        SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        String username;
+
+
+        if (principal instanceof UserDetails) {
+            username = ((UserDetails)principal).getUsername();
+        } else {
+            username = principal.toString();
+        }
+
+        Optional<User> user = userRepository.findByCredential_Username(username);
+
+        if (user.isEmpty()) throw new InternalServerError("Su usuario no se pudo encontrar, contacte al administrador");
+
+        return user.get();
     }
 }

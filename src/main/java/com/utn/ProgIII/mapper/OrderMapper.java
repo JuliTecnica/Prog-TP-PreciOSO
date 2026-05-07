@@ -21,14 +21,14 @@ public class OrderMapper {
     @Autowired
     private ProductMapper productMapper;
 
-    public List<OrderItem> toOrderItemEntity(Map<Product,Double> map)
+    public List<OrderItem> toOrderItemEntity(Map<Product,Integer> map)
     {
         List<OrderItem> orderItems = new ArrayList<>();
 
-        for(Map.Entry<Product,Double> value : map.entrySet())
+        for(Map.Entry<Product,Integer> value : map.entrySet())
         {
             Product product = value.getKey();
-            Double selected = value.getValue();
+            Integer selected = value.getValue();
 
             OrderItem orderitem = OrderItem.builder()
                     .product(product)

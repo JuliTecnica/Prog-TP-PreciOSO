@@ -6,6 +6,6 @@ public record CreateOrderItem(
         @Schema(example = "1")
         Long itemId,
         @Schema(example = "20")
-        Double quantity
+        Integer quantity
 ) {
 }

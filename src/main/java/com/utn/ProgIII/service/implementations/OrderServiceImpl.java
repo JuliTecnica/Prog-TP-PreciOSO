@@ -13,20 +13,15 @@ import com.utn.ProgIII.model.Product.Product;
 import com.utn.ProgIII.model.User.User;
 import com.utn.ProgIII.repository.OrderRepository;
 import com.utn.ProgIII.repository.ProductRepository;
-import com.utn.ProgIII.repository.UserRepository;
 import com.utn.ProgIII.service.interfaces.OrderService;
 import com.utn.ProgIII.service.interfaces.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.security.Key;
 import java.sql.Timestamp;
 import java.time.Instant;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 @Service
 public class OrderServiceImpl implements OrderService {
@@ -40,15 +35,19 @@ public class OrderServiceImpl implements OrderService {
     private UserService userService;
 
     @Override
-    @Transactional
     public CreatedOrderDTO createOrder(CreateOrderDTO createOrderDTO) {
-        Map<Product,Double> products_mapping = createCartMap(createOrderDTO);
-        List<OrderItem> item_list = orderMapper.toOrderItemEntity(products_mapping);
+        List<OrderItem> item_list = createCartList(createOrderDTO);
+        List<String> failures = checkIfStockIsEnough(item_list);
+
+        if(!failures.isEmpty())
+        {
+            throw new BadRequestException("El stock actual de los siguientes productos es menor que el requerido: " + failures.toString());
+        }
 
         User user = userService.getCurrentUser();
 
         OrderDetails orderDetails = new OrderDetails();
-        System.out.println(item_list);
+        item_list.forEach((item) -> item.setOrderDetails(orderDetails));
         orderDetails.setOrderItems(item_list);
         orderDetails.setCreatedAt(Timestamp.from(Instant.now()));
         orderDetails.setTotal(orderDetails.calculateTotal());
@@ -59,28 +58,53 @@ public class OrderServiceImpl implements OrderService {
         // im very doubtful that we'll actually use discounts and whatnot
 
         OrderDetails saved = orderRepository.save(orderDetails);
+        handleDeletingStock(saved.getOrderItems());
 
         return orderMapper.toCreatedOrderDTO(saved);
     }
 
-    private Map<Product,Double> createCartMap(CreateOrderDTO createOrderDTO)
+    private List<OrderItem> createCartList(CreateOrderDTO createOrderDTO)
     {
         List<CreateOrderItem> createOrderItemList = createOrderDTO.items().stream().filter((x) -> x.quantity() != 0).toList();
         if(createOrderDTO.items().isEmpty()) throw new BadRequestException("Debe tener al menos 1 elemento en el carrito!");
 
         List<Long> ids = createOrderDTO.items().stream().map(CreateOrderItem::itemId).toList();
-        List<Product> products = productRepository.findAllById(ids);
+        List<Product> products = productRepository.findAllById(ids).stream().filter((prod) -> prod.getPrice() != null).toList();
 
         if(products.size() != ids.size()) throw new InternalServerError("Algunos productos no están disponibles!");
 
-        Map<Product, Double> products_mapping = new HashMap<>();
+        Map<Product, Integer> products_mapping = new HashMap<>();
         // awful, but actually works
         products.forEach((x) -> products_mapping.put(
                 x, createOrderItemList.stream().filter(
                         (y) -> Objects.equals(y.itemId(), x.getIdProduct())).findFirst().get().quantity()));
 
-
-
-        return products_mapping;
+        return orderMapper.toOrderItemEntity(products_mapping);
     }
+
+    private List<String> checkIfStockIsEnough(List<OrderItem> items)
+    {
+        List<String> failures = new ArrayList<>();
+        for (OrderItem item : items)
+        {
+            Product product = item.getProduct();
+            if((product.getStock() - item.getQuantity()) < 0)
+            {
+                failures.add(product.getName());
+            }
+        }
+
+        return failures;
+    }
+
+    private void handleDeletingStock(List<OrderItem> items)
+    {
+        for (OrderItem item : items)
+        {
+            Product product = item.getProduct();
+            product.setStock(product.getStock() - item.getQuantity());
+            productRepository.save(product);
+        }
+    }
+
 }

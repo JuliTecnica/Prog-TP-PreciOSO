@@ -20,7 +20,6 @@ public class OrderDetails {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
-    @ToString.Exclude
     private User user;
 
     private Double total;
@@ -28,9 +27,10 @@ public class OrderDetails {
     private Double finalTotal;
     private Timestamp createdAt;
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "orderDetails")
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "orderDetails",cascade = CascadeType.ALL, orphanRemoval = true)
     private List<OrderItem> orderItems;
 
+    @Enumerated(EnumType.STRING)
     private OrderStatus status;
 
     public Double calculateTotal()

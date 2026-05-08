@@ -4,6 +4,7 @@ import com.utn.ProgIII.dto.CreatedOrderDTO;
 import com.utn.ProgIII.dto.StateChangeDTO;
 import com.utn.ProgIII.dto.ViewOrderDTO;
 import com.utn.ProgIII.service.interfaces.OrderService;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -21,7 +22,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 @RestController
 @RequestMapping("/orders")
-@Tag(name = "Productos y Proveedores", description = "Operaciones relacionadas con la relación de productos y proveedores")
+@Tag(name = "Pedidos", description = "Operaciones relacionadas con pedidos")
 public class OrderController {
     @Autowired
     private OrderService orderService;
@@ -31,6 +32,7 @@ public class OrderController {
             array = @ArraySchema(schema = @Schema(implementation = CreatedOrderDTO.class))
     ))
     @GetMapping("")
+    @Operation(summary = "Busca pedidos segun el estado y dni", description = "Busca pedidos segun el estado y el dni ingresado y genera una pagina")
     public ResponseEntity<Page<ViewOrderDTO>> viewOrders(
             @ParameterObject @PageableDefault(size = 10) Pageable paginacion,
             @RequestParam(required = false) String status,
@@ -48,6 +50,7 @@ public class OrderController {
             mediaType = "application/json",
             schema = @Schema(implementation = ProblemDetail.class)
     ))
+    @Operation(summary = "Busca un pedido por ID", description = "Busca un pedido por ID")
     @GetMapping("/{id}")
     public ResponseEntity<ViewOrderDTO> viewOrders(
             @PathVariable Long id
@@ -57,6 +60,7 @@ public class OrderController {
 
     @ApiResponse(responseCode = "204", description = "Cambio de datos", content = @Content())
     @PatchMapping("/{id}")
+    @Operation(summary = "Modifica el estado de un pedido según ID", description = "Modifica el estado de un pedido")
     public ResponseEntity<?> changeOrderState(
             @PathVariable Long id,
             @RequestBody StateChangeDTO status

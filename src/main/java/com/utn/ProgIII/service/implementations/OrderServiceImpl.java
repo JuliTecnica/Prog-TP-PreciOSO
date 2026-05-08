@@ -1,10 +1,7 @@
 package com.utn.ProgIII.service.implementations;
 
 import com.querydsl.core.BooleanBuilder;
-import com.utn.ProgIII.dto.CreateOrderDTO;
-import com.utn.ProgIII.dto.CreateOrderItem;
-import com.utn.ProgIII.dto.CreatedOrderDTO;
-import com.utn.ProgIII.dto.ViewOrderDTO;
+import com.utn.ProgIII.dto.*;
 import com.utn.ProgIII.exceptions.BadRequestException;
 import com.utn.ProgIII.exceptions.InternalServerError;
 import com.utn.ProgIII.exceptions.InvalidRequestException;
@@ -147,5 +144,23 @@ public class OrderServiceImpl implements OrderService {
 
 
         return orderMapper.toViewOrderDTO(orderDetails);
+    }
+
+    @Override
+    public void changeOrderStatus(Long id, StateChangeDTO stateChangeDTO) {
+        if(stateChangeDTO.status() != null && !EnumUtils.isValidEnum(OrderStatus.class, stateChangeDTO.status().toUpperCase())) {
+            throw new InvalidRequestException("Ese estado no está presente");
+        }
+        OrderDetails orderDetails = orderRepository.findById(id).orElseThrow(() -> new NotFoundException("Ese pedido no existe!"));
+
+        OrderStatus orderStatus = OrderStatus.valueOf(stateChangeDTO.status());
+
+        if(orderDetails.getStatus() == OrderStatus.COMPLETE || orderDetails.getStatus() == OrderStatus.CANCELLED)
+        {
+            throw new InvalidRequestException("No es posible cambiar el estado de la orden si está completa o cancelada!");
+        }
+
+        orderDetails.setStatus(orderStatus);
+        orderRepository.save(orderDetails);
     }
 }

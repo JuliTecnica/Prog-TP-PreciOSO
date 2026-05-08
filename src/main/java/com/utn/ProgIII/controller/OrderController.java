@@ -1,7 +1,7 @@
 package com.utn.ProgIII.controller;
 
-import com.utn.ProgIII.dto.BasicUserInfoDTO;
 import com.utn.ProgIII.dto.CreatedOrderDTO;
+import com.utn.ProgIII.dto.StateChangeDTO;
 import com.utn.ProgIII.dto.ViewOrderDTO;
 import com.utn.ProgIII.service.interfaces.OrderService;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
@@ -53,5 +53,15 @@ public class OrderController {
             @PathVariable Long id
     ){
         return ResponseEntity.ok(orderService.getOrderById(id));
+    }
+
+    @ApiResponse(responseCode = "204", description = "Cambio de datos", content = @Content())
+    @PatchMapping("/{id}")
+    public ResponseEntity<?> changeOrderState(
+            @PathVariable Long id,
+            @RequestBody StateChangeDTO status
+    ) {
+        orderService.changeOrderStatus(id,status);
+        return ResponseEntity.noContent().build();
     }
 }

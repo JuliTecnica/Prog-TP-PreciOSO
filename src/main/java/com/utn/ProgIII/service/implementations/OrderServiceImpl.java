@@ -8,6 +8,7 @@ import com.utn.ProgIII.dto.ViewOrderDTO;
 import com.utn.ProgIII.exceptions.BadRequestException;
 import com.utn.ProgIII.exceptions.InternalServerError;
 import com.utn.ProgIII.exceptions.InvalidRequestException;
+import com.utn.ProgIII.exceptions.NotFoundException;
 import com.utn.ProgIII.mapper.OrderMapper;
 import com.utn.ProgIII.model.Order.OrderDetails;
 import com.utn.ProgIII.model.Order.OrderItem;
@@ -140,4 +141,11 @@ public class OrderServiceImpl implements OrderService {
         return orderRepository.findAll(booleanBuilder,pageable).map(orderMapper::toViewOrderDTO);
     }
 
+    @Override
+    public ViewOrderDTO getOrderById(Long id) {
+        OrderDetails orderDetails = orderRepository.findById(id).orElseThrow(() -> new NotFoundException("Ese pedido no existe!"));
+
+
+        return orderMapper.toViewOrderDTO(orderDetails);
+    }
 }

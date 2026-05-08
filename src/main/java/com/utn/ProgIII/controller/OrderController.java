@@ -14,11 +14,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.http.ProblemDetail;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 @RestController
@@ -28,7 +26,7 @@ public class OrderController {
     @Autowired
     private OrderService orderService;
 
-    @ApiResponse(responseCode = "200", description = "Busca de datos segun parametros", content = @Content(
+    @ApiResponse(responseCode = "200", description = "Datos encontrados", content = @Content(
             mediaType = "application/json",
             array = @ArraySchema(schema = @Schema(implementation = CreatedOrderDTO.class))
     ))
@@ -40,5 +38,20 @@ public class OrderController {
     )
     {
         return ResponseEntity.ok(orderService.getOrdersPage(paginacion, status, dni));
+    }
+
+    @ApiResponse(responseCode = "200", description = "Datos encontrados", content = @Content(
+            mediaType = "application/json",
+            array = @ArraySchema(schema = @Schema(implementation = CreatedOrderDTO.class))
+    ))
+    @ApiResponse(responseCode = "404", description = "Datos no encontrados", content = @Content(
+            mediaType = "application/json",
+            schema = @Schema(implementation = ProblemDetail.class)
+    ))
+    @GetMapping("/{id}")
+    public ResponseEntity<ViewOrderDTO> viewOrders(
+            @PathVariable Long id
+    ){
+        return ResponseEntity.ok(orderService.getOrderById(id));
     }
 }

@@ -10,4 +10,5 @@ public interface OrderService {
     CreatedOrderDTO createOrder(CreateOrderDTO createOrderDTO);
 
     Page<ViewOrderDTO> getOrdersPage(Pageable pageable, String status, String dni);
+    ViewOrderDTO getOrderById(Long id);
 }

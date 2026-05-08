@@ -161,6 +161,22 @@ public class OrderServiceImpl implements OrderService {
         }
 
         orderDetails.setStatus(orderStatus);
+
+        if(orderDetails.getStatus() == OrderStatus.CANCELLED)
+        {
+            restoreProductStock(orderDetails.getOrderItems());
+        }
+
         orderRepository.save(orderDetails);
+    }
+
+    private void restoreProductStock(List<OrderItem> items)
+    {
+        for (OrderItem item : items)
+        {
+            Product product = item.getProduct();
+            product.setStock(product.getStock() + item.getQuantity());
+            productRepository.save(product);
+        }
     }
 }

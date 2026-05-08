@@ -3,6 +3,7 @@ package com.utn.ProgIII.mapper;
 import com.utn.ProgIII.dto.CreateOrderDTO;
 import com.utn.ProgIII.dto.CreatedOrderDTO;
 import com.utn.ProgIII.dto.OrderItemDTO;
+import com.utn.ProgIII.dto.ViewOrderDTO;
 import com.utn.ProgIII.model.Order.OrderDetails;
 import com.utn.ProgIII.model.Order.OrderItem;
 import com.utn.ProgIII.model.Product.Product;
@@ -20,6 +21,8 @@ public class OrderMapper {
 
     @Autowired
     private ProductMapper productMapper;
+    @Autowired
+    private UserMapper userMapper;
 
     public List<OrderItem> toOrderItemEntity(Map<Product,Integer> map)
     {
@@ -60,6 +63,19 @@ public class OrderMapper {
                 productMapper.ProductDTOOrder(orderItem.getProduct()),
                 orderItem.getUnit_price(),
                 orderItem.getQuantity()
+        );
+    }
+
+    public ViewOrderDTO toViewOrderDTO(OrderDetails orderDetails)
+    {
+        return new ViewOrderDTO(
+                orderDetails.getOrderDetailsId(),
+                userMapper.toUserBasicInfoDTO(orderDetails.getUser()),
+                orderDetails.getTotal(),
+                orderDetails.getFinalTotal(),
+                orderDetails.getStatus().toString(),
+                orderDetails.getCreatedAt().toString(),
+                orderDetails.getOrderItems().stream().map(this::toOrderItemDTO).toList()
         );
     }
 }

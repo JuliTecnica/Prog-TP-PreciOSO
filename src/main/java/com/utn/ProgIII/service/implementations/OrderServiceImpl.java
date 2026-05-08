@@ -1,23 +1,29 @@
 package com.utn.ProgIII.service.implementations;
 
+import com.querydsl.core.BooleanBuilder;
 import com.utn.ProgIII.dto.CreateOrderDTO;
 import com.utn.ProgIII.dto.CreateOrderItem;
 import com.utn.ProgIII.dto.CreatedOrderDTO;
+import com.utn.ProgIII.dto.ViewOrderDTO;
 import com.utn.ProgIII.exceptions.BadRequestException;
 import com.utn.ProgIII.exceptions.InternalServerError;
+import com.utn.ProgIII.exceptions.InvalidRequestException;
 import com.utn.ProgIII.mapper.OrderMapper;
 import com.utn.ProgIII.model.Order.OrderDetails;
 import com.utn.ProgIII.model.Order.OrderItem;
 import com.utn.ProgIII.model.Order.OrderStatus;
+import com.utn.ProgIII.model.Order.QOrderDetails;
 import com.utn.ProgIII.model.Product.Product;
 import com.utn.ProgIII.model.User.User;
 import com.utn.ProgIII.repository.OrderRepository;
 import com.utn.ProgIII.repository.ProductRepository;
 import com.utn.ProgIII.service.interfaces.OrderService;
 import com.utn.ProgIII.service.interfaces.UserService;
+import org.apache.commons.lang3.EnumUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.Timestamp;
 import java.time.Instant;
@@ -105,6 +111,33 @@ public class OrderServiceImpl implements OrderService {
             product.setStock(product.getStock() - item.getQuantity());
             productRepository.save(product);
         }
+    }
+
+
+    @Override
+    public Page<ViewOrderDTO> getOrdersPage(Pageable pageable, String status, String dni) {
+
+        QOrderDetails QorderDetails = QOrderDetails.orderDetails;
+        BooleanBuilder booleanBuilder = new BooleanBuilder().or(QorderDetails.isNotNull());
+
+        if(status != null && !EnumUtils.isValidEnum(OrderStatus.class, status.toUpperCase())) {
+            throw new InvalidRequestException("Ese estado no está presente");
+        }
+
+        if(status != null)
+        {
+            OrderStatus orderStatus = OrderStatus.valueOf(status);
+            booleanBuilder.and(QorderDetails.status.eq(orderStatus));
+        }
+
+        if(dni != null)
+        {
+            booleanBuilder.and(QorderDetails.user.dni.eq(dni));
+        }
+
+
+
+        return orderRepository.findAll(booleanBuilder,pageable).map(orderMapper::toViewOrderDTO);
     }
 
 }

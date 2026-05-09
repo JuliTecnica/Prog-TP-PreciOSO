@@ -18,7 +18,6 @@ import com.utn.ProgIII.repository.ProductRepository;
 import com.utn.ProgIII.service.interfaces.OrderService;
 import com.utn.ProgIII.service.interfaces.UserService;
 import org.apache.commons.lang3.EnumUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -29,14 +28,17 @@ import java.util.*;
 
 @Service
 public class OrderServiceImpl implements OrderService {
-    @Autowired
-    private ProductRepository productRepository;
-    @Autowired
-    private OrderRepository orderRepository;
-    @Autowired
-    private OrderMapper orderMapper;
-    @Autowired
-    private UserService userService;
+    private final ProductRepository productRepository;
+    private final OrderRepository orderRepository;
+    private final OrderMapper orderMapper;
+    private final UserService userService;
+
+    public OrderServiceImpl(ProductRepository productRepository, OrderRepository orderRepository, OrderMapper orderMapper, UserService userService) {
+        this.productRepository = productRepository;
+        this.orderRepository = orderRepository;
+        this.orderMapper = orderMapper;
+        this.userService = userService;
+    }
 
     @Override
     public CreatedOrderDTO createOrder(CreateOrderDTO createOrderDTO) {

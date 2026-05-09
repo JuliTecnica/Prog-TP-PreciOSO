@@ -268,8 +268,6 @@ public class UserServiceImpl implements UserService {
     }
 
     public User getCurrentUser() {
-        SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-
         Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         String username;
 
@@ -282,7 +280,7 @@ public class UserServiceImpl implements UserService {
 
         Optional<User> user = userRepository.findByCredential_Username(username);
 
-        if (user.isEmpty()) throw new InternalServerError("Su usuario no se pudo encontrar, contacte al administrador");
+        if (user.isEmpty()) throw new NotFoundException("Su usuario no se pudo encontrar, contacte al administrador");
 
         return user.get();
     }

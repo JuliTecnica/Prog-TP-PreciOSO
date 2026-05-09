@@ -181,4 +181,26 @@ public class OrderServiceImpl implements OrderService {
             productRepository.save(product);
         }
     }
+
+    @Override
+    public Page<ViewOrderDTO> getMyOrders(String status, Pageable pageable) {
+        QOrderDetails orderDetails = QOrderDetails.orderDetails;
+        BooleanBuilder booleanBuilder = new BooleanBuilder().or(orderDetails.isNotNull());
+
+        if(status != null && !EnumUtils.isValidEnum(OrderStatus.class, status.toUpperCase())) {
+            throw new InvalidRequestException("Ese estado no está presente");
+        }
+
+        User user = userService.getCurrentUser();
+
+        booleanBuilder.and(orderDetails.user.eq(user));
+
+        if(status != null)
+        {
+            OrderStatus orderStatus = OrderStatus.valueOf(status);
+            booleanBuilder.and(orderDetails.status.eq(orderStatus));
+        }
+
+        return orderRepository.findAll(booleanBuilder,pageable).map(orderMapper::toViewOrderDTO);
+    }
 }

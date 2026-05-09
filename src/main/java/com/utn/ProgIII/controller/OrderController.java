@@ -19,7 +19,6 @@ import org.springframework.http.ProblemDetail;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 @RestController
 @RequestMapping("/orders")
 @Tag(name = "Pedidos", description = "Operaciones relacionadas con pedidos")
@@ -67,5 +66,19 @@ public class OrderController {
     ) {
         orderService.changeOrderStatus(id,status);
         return ResponseEntity.noContent().build();
+    }
+
+    @ApiResponse(responseCode = "200", description = "Datos encontrados", content = @Content(
+            mediaType = "application/json",
+            array = @ArraySchema(schema = @Schema(implementation = ViewOrderDTO.class))
+    ))
+    @Operation(summary = "Busca pedidos del usuario", description = "Busca los pedidos del usuario que hace el pedido")
+    @GetMapping("/my-orders")
+    public ResponseEntity<Page<ViewOrderDTO>> viewMyOrders(
+            @RequestParam(required = false) String status,
+            @ParameterObject @PageableDefault(size = 10) Pageable paginacion
+    )
+    {
+        return ResponseEntity.ok(orderService.getMyOrders(status, paginacion));
     }
 }

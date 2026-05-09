@@ -13,4 +13,5 @@ public interface OrderService {
     Page<ViewOrderDTO> getOrdersPage(Pageable pageable, String status, String dni);
     ViewOrderDTO getOrderById(Long id);
     void changeOrderStatus(Long id, StateChangeDTO stateChangeDTO);
+    Page<ViewOrderDTO> getMyOrders(String status, Pageable pageable);
 }

@@ -248,6 +248,14 @@ public class GlobalExceptionHandler {
         return problemDetail;
     }
 
+    @ExceptionHandler({ForbiddenActionAcception.class})
+    private ProblemDetail handleForbiddenActionException(ForbiddenActionAcception e)
+    {
+        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.FORBIDDEN, e.getMessage());
+        problemDetail.setProperty("timestamp", Instant.now().toString());
+
+        return problemDetail;
+    }
 
 
 }

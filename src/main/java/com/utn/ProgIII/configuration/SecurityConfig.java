@@ -66,7 +66,7 @@ public class SecurityConfig {
 
                         .requestMatchers(HttpMethod.GET, "/orders/my-orders").hasRole("CUSTOMER")
                         .requestMatchers(HttpMethod.GET, "/orders/**").hasRole("EMPLOYEE")
-                        .requestMatchers(HttpMethod.PATCH, "/orders/**").hasRole("MANAGER")
+                        .requestMatchers(HttpMethod.PATCH, "/orders/**").hasRole("CUSTOMER")
 
                         .requestMatchers(HttpMethod.GET, "/misc/dollar").hasRole("MANAGER")
                         .requestMatchers(HttpMethod.GET, "/enums/**").permitAll()

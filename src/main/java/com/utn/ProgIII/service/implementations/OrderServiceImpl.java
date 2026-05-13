@@ -2,11 +2,9 @@ package com.utn.ProgIII.service.implementations;
 
 import com.querydsl.core.BooleanBuilder;
 import com.utn.ProgIII.dto.*;
-import com.utn.ProgIII.exceptions.BadRequestException;
-import com.utn.ProgIII.exceptions.InternalServerError;
-import com.utn.ProgIII.exceptions.InvalidRequestException;
-import com.utn.ProgIII.exceptions.NotFoundException;
+import com.utn.ProgIII.exceptions.*;
 import com.utn.ProgIII.mapper.OrderMapper;
+import com.utn.ProgIII.model.Credential.Role;
 import com.utn.ProgIII.model.Order.OrderDetails;
 import com.utn.ProgIII.model.Order.OrderItem;
 import com.utn.ProgIII.model.Order.OrderStatus;
@@ -15,8 +13,10 @@ import com.utn.ProgIII.model.Product.Product;
 import com.utn.ProgIII.model.User.User;
 import com.utn.ProgIII.repository.OrderRepository;
 import com.utn.ProgIII.repository.ProductRepository;
+import com.utn.ProgIII.service.interfaces.AuthService;
 import com.utn.ProgIII.service.interfaces.OrderService;
 import com.utn.ProgIII.service.interfaces.UserService;
+import com.utn.ProgIII.validations.OrderValidations;
 import org.apache.commons.lang3.EnumUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -31,13 +31,17 @@ public class OrderServiceImpl implements OrderService {
     private final ProductRepository productRepository;
     private final OrderRepository orderRepository;
     private final OrderMapper orderMapper;
+    private final OrderValidations orderValidations;
     private final UserService userService;
+    private final AuthService authService;
 
-    public OrderServiceImpl(ProductRepository productRepository, OrderRepository orderRepository, OrderMapper orderMapper, UserService userService) {
+    public OrderServiceImpl(ProductRepository productRepository, OrderRepository orderRepository, OrderMapper orderMapper, OrderValidations orderValidations, UserService userService, AuthService authService) {
         this.productRepository = productRepository;
         this.orderRepository = orderRepository;
         this.orderMapper = orderMapper;
+        this.orderValidations = orderValidations;
         this.userService = userService;
+        this.authService = authService;
     }
 
     @Override
@@ -150,17 +154,27 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public void changeOrderStatus(Long id, StateChangeDTO stateChangeDTO) {
+
         if(stateChangeDTO.status() != null && !EnumUtils.isValidEnum(OrderStatus.class, stateChangeDTO.status().toUpperCase())) {
             throw new InvalidRequestException("Ese estado no está presente");
         }
         OrderDetails orderDetails = orderRepository.findById(id).orElseThrow(() -> new NotFoundException("Ese pedido no existe!"));
-
         OrderStatus orderStatus = OrderStatus.valueOf(stateChangeDTO.status());
+
+        User current_user = userService.getCurrentUser();
+
+        if(!authService.hasRole("ROLE_EMPLOYEE"))
+        {
+            if(!orderValidations.UserOwnsTheOrder(current_user,orderDetails) || orderStatus != OrderStatus.CANCELLED) throw new ForbiddenActionAcception("");
+        }
+
 
         if(orderDetails.getStatus() == OrderStatus.COMPLETE || orderDetails.getStatus() == OrderStatus.CANCELLED)
         {
             throw new InvalidRequestException("No es posible cambiar el estado de la orden si está completa o cancelada!");
         }
+
+
 
         orderDetails.setStatus(orderStatus);
 

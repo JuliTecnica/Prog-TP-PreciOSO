@@ -58,6 +58,10 @@ public class OrderController {
     }
 
     @ApiResponse(responseCode = "204", description = "Cambio de datos", content = @Content())
+    @ApiResponse(responseCode = "403", description = "Acción no permitida", content = @Content(
+            mediaType = "application/json",
+            schema = @Schema(implementation = ProblemDetail.class)
+    ))
     @PatchMapping("/{id}")
     @Operation(summary = "Modifica el estado de un pedido según ID", description = "Modifica el estado de un pedido")
     public ResponseEntity<?> changeOrderState(

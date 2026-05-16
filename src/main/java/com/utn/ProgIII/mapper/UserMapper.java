@@ -1,9 +1,6 @@
 package com.utn.ProgIII.mapper;
 
-import com.utn.ProgIII.dto.CreateUserDTO;
-import com.utn.ProgIII.dto.CreateUserNoAuthDTO;
-import com.utn.ProgIII.dto.UserWithCredentialDTO;
-import com.utn.ProgIII.dto.ViewCredentialsDTO;
+import com.utn.ProgIII.dto.*;
 import com.utn.ProgIII.exceptions.NullCredentialsException;
 import com.utn.ProgIII.model.Credential.Credential;
 import com.utn.ProgIII.model.Credential.Role;
@@ -123,5 +120,15 @@ public class UserMapper {
         }
 
         return result;
+    }
+
+    public BasicUserInfoDTO toUserBasicInfoDTO(User user)
+    {
+        return new BasicUserInfoDTO(
+                user.getIdUser(),
+                user.getFirstname(),
+                user.getLastname(),
+                user.getDni()
+        );
     }
 }

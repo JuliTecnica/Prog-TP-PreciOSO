@@ -1,9 +1,6 @@
 package com.utn.ProgIII.mapper;
 
-import com.utn.ProgIII.dto.CategoryDTO;
-import com.utn.ProgIII.dto.CreateProductDTO;
-import com.utn.ProgIII.dto.ProductDTO;
-import com.utn.ProgIII.dto.ViewProductCustomer;
+import com.utn.ProgIII.dto.*;
 import com.utn.ProgIII.exceptions.InvalidRequestException;
 import com.utn.ProgIII.model.Product.Product;
 import com.utn.ProgIII.model.Product.ProductStatus;
@@ -39,6 +36,11 @@ public class ProductMapper {
         String image_url = createImageURL(product.getImage_url());
 
         return new ProductDTO(idProduct,name,status, profitMargin * 100, stock,price,category,image_url);
+    }
+
+    public ProductDTOOrder ProductDTOOrder(Product product)
+    {
+        return new ProductDTOOrder(product.getIdProduct(), product.getName());
     }
 
     /**

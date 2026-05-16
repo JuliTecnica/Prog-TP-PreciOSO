@@ -4,6 +4,7 @@ import com.utn.ProgIII.dto.CreateUserDTO;
 import com.utn.ProgIII.dto.CreateUserNoAuthDTO;
 import com.utn.ProgIII.dto.StateChangeDTO;
 import com.utn.ProgIII.dto.UserWithCredentialDTO;
+import com.utn.ProgIII.model.User.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -19,4 +20,5 @@ public interface UserService {
     void toggleUserStatus(Long id, StateChangeDTO dto);
 
     Page<UserWithCredentialDTO> getUsersPage(Pageable pageable, String status, String role, String dni);
+    User getCurrentUser();
 }

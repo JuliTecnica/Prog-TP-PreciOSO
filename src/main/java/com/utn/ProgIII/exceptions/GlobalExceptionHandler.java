@@ -8,15 +8,11 @@ import org.springframework.data.mapping.PropertyReferenceException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ProblemDetail;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.AuthenticationException;
-import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
-import java.net.URI;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
@@ -248,8 +244,8 @@ public class GlobalExceptionHandler {
         return problemDetail;
     }
 
-    @ExceptionHandler({ForbiddenActionAcception.class})
-    private ProblemDetail handleForbiddenActionException(ForbiddenActionAcception e)
+    @ExceptionHandler({ForbiddenActionException.class})
+    private ProblemDetail handleForbiddenActionException(ForbiddenActionException e)
     {
         ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.FORBIDDEN, e.getMessage());
         problemDetail.setProperty("timestamp", Instant.now().toString());

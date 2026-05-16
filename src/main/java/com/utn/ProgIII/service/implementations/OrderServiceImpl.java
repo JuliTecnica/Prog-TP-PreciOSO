@@ -4,7 +4,6 @@ import com.querydsl.core.BooleanBuilder;
 import com.utn.ProgIII.dto.*;
 import com.utn.ProgIII.exceptions.*;
 import com.utn.ProgIII.mapper.OrderMapper;
-import com.utn.ProgIII.model.Credential.Role;
 import com.utn.ProgIII.model.Order.OrderDetails;
 import com.utn.ProgIII.model.Order.OrderItem;
 import com.utn.ProgIII.model.Order.OrderStatus;
@@ -165,7 +164,7 @@ public class OrderServiceImpl implements OrderService {
 
         if(!authService.hasRole("ROLE_EMPLOYEE"))
         {
-            if(!orderValidations.UserOwnsTheOrder(current_user,orderDetails) || orderStatus != OrderStatus.CANCELLED) throw new ForbiddenActionAcception("");
+            if(!orderValidations.UserOwnsTheOrder(current_user,orderDetails) || orderStatus != OrderStatus.CANCELLED) throw new ForbiddenActionException("");
         }
 
 

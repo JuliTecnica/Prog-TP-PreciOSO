@@ -14,7 +14,9 @@ import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.data.web.SortDefault;
 import org.springframework.http.ProblemDetail;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -33,7 +35,7 @@ public class OrderController {
     @GetMapping("")
     @Operation(summary = "Busca pedidos segun el estado y dni", description = "Busca pedidos segun el estado y el dni ingresado y genera una pagina")
     public ResponseEntity<Page<ViewOrderDTO>> viewOrders(
-            @ParameterObject @PageableDefault(size = 10) Pageable paginacion,
+            @ParameterObject @PageableDefault(size = 10) @SortDefault(sort = "createdAt", direction = Sort.Direction.DESC) Pageable paginacion,
             @RequestParam(required = false) String status,
             @RequestParam(required = false) String dni
     )
@@ -80,7 +82,7 @@ public class OrderController {
     @GetMapping("/my-orders")
     public ResponseEntity<Page<ViewOrderDTO>> viewMyOrders(
             @RequestParam(required = false) String status,
-            @ParameterObject @PageableDefault(size = 10) Pageable paginacion
+            @ParameterObject @PageableDefault(size = 10) @SortDefault(sort = "createdAt", direction = Sort.Direction.DESC) Pageable paginacion
     )
     {
         return ResponseEntity.ok(orderService.getMyOrders(status, paginacion));

@@ -140,6 +140,8 @@ public class UserServiceImpl implements UserService {
         credentialValidations.validateModifiedUsernameNotExists(currentUserData.getCredential().getUsername(),
                 newUserData.getCredential().getUsername());
 
+        newUserData.setIdUser(currentUserData.getIdUser());
+
         if(userValidations.checkifRequestedUserIsTheSame(newUserData) && newUserData.getStatus() == UserStatus.DISABLED)
         {
             throw new ForbiddenModificationException("No puede desactivarse el mismo usuario que ejecuta la operación");
@@ -150,7 +152,6 @@ public class UserServiceImpl implements UserService {
             throw new ForbiddenModificationException("Administradores no pueden cambiar a ese rol");
         }
 
-        newUserData.setIdUser(currentUserData.getIdUser());
         newUserData.getCredential().setIdCredential(currentUserData.getCredential().getIdCredential());
         newUserData.getCredential().setPassword(passwordEncoder.encode(newUserData.getCredential().getPassword()));
 
@@ -191,6 +192,9 @@ public class UserServiceImpl implements UserService {
     public void toggleUserStatus(Long id, StateChangeDTO dto) {
         User user = userRepository.findById(id).orElseThrow(() -> new UserNotFoundException("Usuario no encontrado"));
 
+        if (userValidations.checkifRequestedUserIsTheSame(user) && dto.status().toUpperCase().equals(UserStatus.DISABLED.toString())) {
+            throw new ForbiddenModificationException("No puede desactivarse el mismo usuario que ejecuta la operación");
+        }
 
         if(dto.status() != null && !EnumUtils.isValidEnum(UserStatus.class, dto.status().toUpperCase()))
         {

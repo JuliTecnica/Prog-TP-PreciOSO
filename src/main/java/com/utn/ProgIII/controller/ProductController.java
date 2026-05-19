@@ -1,11 +1,9 @@
 package com.utn.ProgIII.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.utn.ProgIII.dto.CreateProductDTO;
 import com.utn.ProgIII.dto.ProductDTO;
-import com.utn.ProgIII.dto.ViewProductCustomer;
 import com.utn.ProgIII.exceptions.BadRequestException;
 import com.utn.ProgIII.service.interfaces.ProductService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -120,9 +118,10 @@ public class ProductController {
             @RequestParam(required = false) String name,
             @RequestParam(required = false) String status,
             @RequestParam(required = false) List<Long> category,
+            @RequestParam(required = false) Integer rem_stock,
             @RequestParam(required = false) Long id
     ){
-        Page<ProductDTO> response = productService.getProductsPage(paginacion, name, status, category, id);
+        Page<ProductDTO> response = productService.getProductsPage(paginacion, name, status, category, id, rem_stock);
 
         return ResponseEntity.ok(response);
     }

@@ -2,7 +2,6 @@ package com.utn.ProgIII.service.interfaces;
 
 import com.utn.ProgIII.dto.CreateProductDTO;
 import com.utn.ProgIII.dto.ProductDTO;
-import com.utn.ProgIII.dto.ViewProductCustomer;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.multipart.MultipartFile;
@@ -17,5 +16,5 @@ public interface ProductService {
     ProductDTO createProductDto (CreateProductDTO prductoDto, MultipartFile image);
     ProductDTO updateProduct (Long id, CreateProductDTO productDto, MultipartFile image);
     void deleteProduct (Long id);
-    Page<ProductDTO> getProductsPage(Pageable pageable, String name, String status, List<Long> categories, Long id);
+    Page<ProductDTO> getProductsPage(Pageable pageable, String name, String status, List<Long> categories, Long id, Integer rem_stock);
 }

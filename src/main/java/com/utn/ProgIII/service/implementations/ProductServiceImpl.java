@@ -4,7 +4,6 @@ import com.querydsl.core.BooleanBuilder;
 import com.utn.ProgIII.dto.CreateProductDTO;
 
 import com.utn.ProgIII.dto.ProductDTO;
-import com.utn.ProgIII.dto.ViewProductCustomer;
 import com.utn.ProgIII.exceptions.*;
 import com.utn.ProgIII.mapper.ProductMapper;
 import com.utn.ProgIII.model.Product.Category;
@@ -184,11 +183,12 @@ public class ProductServiceImpl implements ProductService {
      * @param name       Nombre del producto buscado
      * @param status     Estado del producto buscado
      * @param categories Listado de categorias de productos (puede ser buscado individualmente)
-     * @param id Id del producto
+     * @param id         Id del producto
+     * @param rem_stock Stock restante (se usara para buscar productos menor o igual a esto)
      * @return Pagina de DTOs de productos
      */
     @Override
-    public Page<ProductDTO> getProductsPage(Pageable pageable, String name, String status, List<Long> categories, Long id) {
+    public Page<ProductDTO> getProductsPage(Pageable pageable, String name, String status, List<Long> categories, Long id, Integer rem_stock) {
         QProduct product = QProduct.product;
         BooleanBuilder builder = new BooleanBuilder().or(product.isNotNull());
 
@@ -204,6 +204,11 @@ public class ProductServiceImpl implements ProductService {
 
         if(status != null && !EnumUtils.isValidEnum(ProductStatus.class, status.toUpperCase())) {
             throw new InvalidRequestException("Ese estado no está presente");
+        }
+
+        if(rem_stock != null)
+        {
+            builder.and(product.stock.loe(rem_stock));
         }
 
         if (status != null && !authService.isEmployee())

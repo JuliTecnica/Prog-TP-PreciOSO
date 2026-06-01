@@ -36,7 +36,7 @@ public class UserDetailServiceImpl implements UserDetailsService {
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
 
         Credential credential = credentialRepository.findByUsername(username).orElseThrow(
-                () -> new CredentialNotFoundException("El usuario no se encuentra en el sistema")
+                () -> new CredentialNotFoundException("Por favor, revise sus datos e intente de nuevo")
         );
 
         User user = userRepository.findByCredential(credential);

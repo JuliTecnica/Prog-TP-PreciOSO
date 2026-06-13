@@ -8,6 +8,7 @@ import org.springframework.data.mapping.PropertyReferenceException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ProblemDetail;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -253,5 +254,13 @@ public class GlobalExceptionHandler {
         return problemDetail;
     }
 
+    @ExceptionHandler({AuthenticationException.class})
+    private ProblemDetail handleAuthenticationException(AuthenticationException e) {
+        ProblemDetail problemDetail =  ProblemDetail.forStatusAndDetail(HttpStatus.UNAUTHORIZED, e.getMessage());
+        problemDetail.setTitle("Error de Autenticación");
+        problemDetail.setDetail("Compruebe usuario y contraseña");
+        problemDetail.setProperty("timestamp", Instant.now().toString());
+        return problemDetail;
+    }
 
 }

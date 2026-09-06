@@ -42,7 +42,6 @@ public class PictureServiceImpl implements PictureService {
 
         String filepath = path + File.separator + filename;
 
-        System.out.println(filepath);
         File f = new File(path);
         if (!f.exists())
         {

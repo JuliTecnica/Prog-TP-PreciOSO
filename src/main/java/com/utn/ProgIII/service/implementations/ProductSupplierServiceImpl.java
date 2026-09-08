@@ -285,7 +285,6 @@ public class ProductSupplierServiceImpl implements ProductSupplierService {
     @Override
     public void handlePostSupplierDelete(List<ProductSupplier> productSupplierRels) {
         List<Product> change_queue = new ArrayList<>();
-        System.out.println(productSupplierRels);
 
         for(ProductSupplier productSupplier : productSupplierRels)
         {
